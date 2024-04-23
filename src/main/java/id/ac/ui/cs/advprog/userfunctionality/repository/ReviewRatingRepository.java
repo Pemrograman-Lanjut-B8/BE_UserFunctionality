@@ -17,8 +17,8 @@ public class ReviewRatingRepository {
         return reviewRating;
     }
 
-    public List<ReviewRating> findAll() {
-        return reviewRatingData;
+    public Iterator<ReviewRating> findAll() {
+        return reviewRatingData.iterator();
     }
 
     public Optional<ReviewRating> findById(String reviewId) {

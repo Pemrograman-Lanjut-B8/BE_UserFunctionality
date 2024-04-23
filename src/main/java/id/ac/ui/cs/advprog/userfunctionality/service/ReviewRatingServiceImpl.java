@@ -5,8 +5,10 @@ import id.ac.ui.cs.advprog.userfunctionality.repository.ReviewRatingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 @Service
 public class ReviewRatingServiceImpl implements ReviewRatingService {
@@ -21,7 +23,10 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
 
     @Override
     public List<ReviewRating> findAll() {
-        return reviewRatingRepository.findAll();
+        Iterator<ReviewRating> reviewRatingIterator = reviewRatingRepository.findAll();
+        List<ReviewRating> allReviewRating = new ArrayList<>();
+        reviewRatingIterator.forEachRemaining(allReviewRating::add);
+        return allReviewRating;
     }
 
     @Override
