@@ -9,26 +9,15 @@
 <h1>Book Catalog</h1>
 <div id="book-list">
     <!-- Book items will be inserted here -->
+    <ul>
+        <!-- Loop through books and display each book -->
+        <li th:each="book : ${books}">
+            <h2 th:text="${book.title}"></h2>
+            <p><strong>Author:</strong> <span th:text="${book.author}"></span></p>
+            <p><strong>Description:</strong> <span th:text="${book.description}"></span></p>
+            <hr>
+        </li>
+    </ul>
 </div>
-
-<script>
-    // Fetch data from backend
-    fetch('/books/list')
-        .then(response => response.json())
-        .then(books => {
-            const bookList = document.getElementById('book-list');
-            books.forEach(book => {
-                const bookItem = document.createElement('div');
-                bookItem.innerHTML = `
-                        <h2>${book.title}</h2>
-                        <p><strong>Author:</strong> ${book.author}</p>
-                        <p><strong>Description:</strong> ${book.description}</p>
-                        <hr>
-                    `;
-                bookList.appendChild(bookItem);
-            });
-        })
-        .catch(error => console.error('Error fetching books:', error));
-</script>
 </body>
 </html>

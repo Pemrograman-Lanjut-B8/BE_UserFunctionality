@@ -1,5 +1,10 @@
 package id.ac.ui.cs.advprog.userfunctionality.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class Book {
 
     private Long id;
@@ -14,5 +19,4 @@ public class Book {
         this.description = description;
     }
 
-    // Getters and setters
 }
