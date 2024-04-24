@@ -13,13 +13,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class BookServiceTest {
+public class BookServiceImplTest {
 
     @Mock
     private BookRepository bookRepository;
 
     @InjectMocks
-    private BookService bookService = new BookServiceImpl();
+    private BookServiceImpl bookService;
 
     @BeforeEach
     public void setUp() {

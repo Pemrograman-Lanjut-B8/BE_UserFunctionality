@@ -1,10 +1,9 @@
-package id.ac.ui.cs.advprog.userfunctionality.service;
+package id.ac.ui.cs.advprog.userfunctionality.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import id.ac.ui.cs.advprog.userfunctionality.model.Book;
-import id.ac.ui.cs.advprog.userfunctionality.repository.BookRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,13 +12,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class BookServiceTest {
-
-    @Mock
-    private BookRepository bookRepository;
+public class BookRepositoryTest {
 
     @InjectMocks
-    private BookService bookService = new BookServiceImpl();
+    private BookRepository bookRepository;
 
     @BeforeEach
     public void setUp() {
@@ -34,16 +30,16 @@ public class BookServiceTest {
         expectedBooks.add(new Book(2L, "Book B", "Author B", "Description for Book B"));
         expectedBooks.add(new Book(3L, "Book C", "Author C", "Description for Book C"));
 
-        // Mock the behavior of the BookRepository
-        when(bookRepository.getAllBooks()).thenReturn(expectedBooks);
-
         // Call the method under test
-        List<Book> actualBooks = bookService.getAllBooks();
+        List<Book> actualBooks = bookRepository.getAllBooks();
 
         // Verify the result
         assertEquals(expectedBooks.size(), actualBooks.size());
         for (int i = 0; i < expectedBooks.size(); i++) {
-            assertEquals(expectedBooks.get(i), actualBooks.get(i));
+            assertEquals(expectedBooks.get(i).getId(), actualBooks.get(i).getId());
+            assertEquals(expectedBooks.get(i).getTitle(), actualBooks.get(i).getTitle());
+            assertEquals(expectedBooks.get(i).getAuthor(), actualBooks.get(i).getAuthor());
+            assertEquals(expectedBooks.get(i).getDescription(), actualBooks.get(i).getDescription());
         }
     }
 }
