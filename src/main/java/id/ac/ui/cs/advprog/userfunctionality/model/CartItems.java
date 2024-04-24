@@ -9,4 +9,11 @@ public class CartItems {
     private String bookTitle;
     private double price;
     private int quantity;
+
+    public CartItems(long bookId, String bookTitle, double price, int quantity) {
+        this.bookId = bookId;
+        this.bookTitle = bookTitle;
+        this.price = price;
+        this.quantity = quantity;
+    }
 }
