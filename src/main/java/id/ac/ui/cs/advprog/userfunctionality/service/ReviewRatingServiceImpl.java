@@ -17,10 +17,10 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
     private ReviewRatingRepository reviewRatingRepository;
 
     @Override
-    public ReviewRating create(ReviewRating reviewRating) {
-        return reviewRatingRepository.create(reviewRating);
+    public void createReviewRating(ReviewRating reviewRating) {
+        Command createCommand = new CreateReviewRatingCommand(reviewRating, reviewRatingRepository);
+        createCommand.execute();
     }
-
     @Override
     public List<ReviewRating> findAll() {
         Iterator<ReviewRating> reviewRatingIterator = reviewRatingRepository.findAll();
@@ -35,19 +35,13 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
     }
 
     @Override
-    public ReviewRating update(String reviewId, ReviewRating updatedReviewRating) {
-        Optional<ReviewRating> existingReviewRating = reviewRatingRepository.findById(reviewId);
-        if (existingReviewRating.isPresent()) {
-            ReviewRating reviewRating = existingReviewRating.get();
-            reviewRating.setReview(updatedReviewRating.getReview());
-            reviewRating.setRating(updatedReviewRating.getRating());
-            return reviewRatingRepository.update(reviewId, reviewRating);
-        }
-        return null;
+    public void updateReviewRating(String reviewId, ReviewRating updatedReviewRating) {
+        Command updateCommand = new UpdateReviewRatingCommand(reviewId, updatedReviewRating, reviewRatingRepository);
+        updateCommand.execute();
     }
 
     @Override
-    public boolean delete(String reviewId) {
-        return reviewRatingRepository.delete(reviewId);
-    }
+    public void deleteReviewRating(String reviewId) {
+        Command deleteCommand = new DeleteReviewRatingCommand(reviewId, reviewRatingRepository);
+        deleteCommand.execute();    }
 }

@@ -26,7 +26,7 @@ public class ReviewRatingController {
 
     @PostMapping("/create")
     public String createReviewRatingPost(@ModelAttribute ReviewRating reviewRating, Model model) {
-        reviewRatingService.create(reviewRating);
+        reviewRatingService.createReviewRating(reviewRating);
         return "redirect:list";
     }
 
@@ -46,13 +46,13 @@ public class ReviewRatingController {
 
     @PostMapping("/edit/{reviewId}")
     public String editReviewRatingPost(@ModelAttribute ReviewRating reviewRating, Model model, @PathVariable("reviewId") String reviewId) {
-        reviewRatingService.update(reviewId, reviewRating);
+        reviewRatingService.updateReviewRating(reviewId, reviewRating);
         return "redirect:/review/list";
     }
 
     @GetMapping("/delete/{reviewId}")
     public String deleteReviewRatingGet(Model model, @PathVariable("reviewId") String reviewId) {
-        reviewRatingService.delete(reviewId);
+        reviewRatingService.deleteReviewRating(reviewId);
         return "redirect:/review/list";
     }
 }
