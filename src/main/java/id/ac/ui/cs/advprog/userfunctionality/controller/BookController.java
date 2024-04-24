@@ -24,10 +24,9 @@ public class BookController {
     }
 
     @GetMapping("/list")
-    public ModelAndView showLandingPage(Model model) {
+    public String showLandingPage(Model model) {
         List<Book> books = bookService.getAllBooks();
-        ModelAndView modelAndView = new ModelAndView("LandingPage");
-        modelAndView.addObject("books", books);
-        return modelAndView;
+        model.addAttribute("books", books);
+        return "LandingPage";
     }
 }
