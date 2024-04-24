@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Landing Page</title>
+</head>
+<body>
+<h1>Book Catalog</h1>
+<div id="book-list">
+    <!-- Book items will be inserted here -->
+    <ul>
+        <!-- Loop through books and display each book -->
+        <li th:each="book : ${books}">
+            <h2 th:text="${book.title}"></h2>
+            <p><strong>Author:</strong> <span th:text="${book.author}"></span></p>
+            <p><strong>Description:</strong> <span th:text="${book.description}"></span></p>
+            <hr>
+        </li>
+    </ul>
+</div>
+</body>
+</html>
