@@ -15,8 +15,12 @@ import java.util.Optional;
 @RequestMapping("/cart")
 public class CartCheckoutController {
 
+    private final CartCheckoutService cartCheckoutService;
+
     @Autowired
-    private CartCheckoutService cartCheckoutService;
+    public CartCheckoutController(CartCheckoutService cartCheckoutService) {
+        this.cartCheckoutService = cartCheckoutService;
+    }
 
     @GetMapping("/create")
     public String createCartCheckoutPage(Model model) {
