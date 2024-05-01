@@ -17,9 +17,10 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
     private ReviewRatingRepository reviewRatingRepository;
 
     @Override
-    public void createReviewRating(ReviewRating reviewRating) {
+    public ReviewRating createReviewRating(ReviewRating reviewRating) {
         Command createCommand = new CreateReviewRatingCommand(reviewRating, reviewRatingRepository);
         createCommand.execute();
+        return reviewRating;
     }
     @Override
     public List<ReviewRating> findAll() {
@@ -35,9 +36,10 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
     }
 
     @Override
-    public void updateReviewRating(String reviewId, ReviewRating updatedReviewRating) {
+    public ReviewRating updateReviewRating(String reviewId, ReviewRating updatedReviewRating) {
         Command updateCommand = new UpdateReviewRatingCommand(reviewId, updatedReviewRating, reviewRatingRepository);
         updateCommand.execute();
+        return updatedReviewRating;
     }
 
     @Override
