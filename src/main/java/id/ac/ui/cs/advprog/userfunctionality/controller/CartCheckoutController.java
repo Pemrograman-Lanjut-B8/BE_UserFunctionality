@@ -1,17 +1,14 @@
 package id.ac.ui.cs.advprog.userfunctionality.controller;
 
-import id.ac.ui.cs.advprog.userfunctionality.model.CartCheckout;
+import id.ac.ui.cs.advprog.userfunctionality.model.CartCheckoutDTO;
 import id.ac.ui.cs.advprog.userfunctionality.service.CartCheckoutService;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
-@Controller
+@RestController
 @RequestMapping("/cart")
 public class CartCheckoutController {
 
@@ -22,42 +19,43 @@ public class CartCheckoutController {
         this.cartCheckoutService = cartCheckoutService;
     }
 
-    @GetMapping("/create")
-    public String createCartCheckoutPage(Model model) {
-        CartCheckout cartCheckout = new CartCheckout();
-        model.addAttribute("cartCheckout", cartCheckout);
-        return "CreateCartCheckout";
+    @GetMapping("/checkout/{cartId}")
+    public ResponseEntity<CartCheckoutDTO> getCartCheckout(@PathVariable Long cartId) {
+        CartCheckoutDTO checkoutDTO = cartCheckoutService.findCartCheckoutById(cartId);
+        return ResponseEntity.ok(checkoutDTO);
     }
 
     @PostMapping("/create")
-    public String createCartCheckoutPost(@ModelAttribute CartCheckout cartCheckout, Model model) {
-        cartCheckoutService.create(cartCheckout);
-        return "redirect:list";
+    public ResponseEntity<CartCheckoutDTO> createCartCheckout(@RequestBody CartCheckoutDTO cartCheckout) {
+        CartCheckoutDTO createdCartCheckout = cartCheckoutService.createCartCheckout(cartCheckout);
+        return ResponseEntity.ok(createdCartCheckout);
     }
 
     @GetMapping("/list")
-    public String cartCheckoutListPage(Model model) {
-        List<CartCheckout> allCartCheckouts = cartCheckoutService.findAll();
-        model.addAttribute("cartCheckouts", allCartCheckouts);
-        return "CartCheckoutList";
+    public ResponseEntity<List<CartCheckoutDTO>> cartCheckoutList() {
+        List<CartCheckoutDTO> allCartCheckouts = cartCheckoutService.findAll();
+        return ResponseEntity.ok(allCartCheckouts);
     }
 
     @GetMapping("/edit/{cartId}")
-    public String editCartCheckoutPage(Model model, @PathVariable("cartId") Long cartId) {
-        Optional<CartCheckout> cartCheckout = cartCheckoutService.findById(cartId);
-        cartCheckout.ifPresent(value -> model.addAttribute("cartCheckout", value));
-        return "EditCartCheckout";
+    public ResponseEntity<CartCheckoutDTO> editCartCheckoutPage(@PathVariable("cartId") Long cartId) {
+        CartCheckoutDTO cartCheckout = cartCheckoutService.findCartCheckoutById(cartId);
+        return ResponseEntity.ok(cartCheckout);
     }
 
-    @PostMapping("/edit/{cartId}")
-    public String editCartCheckoutPost(@ModelAttribute CartCheckout cartCheckout, Model model, @PathVariable("cartId") Long cartId) {
-        cartCheckoutService.update(cartId, cartCheckout);
-        return "redirect:/cart/list";
+    @PutMapping("/edit/{cartId}")
+    public ResponseEntity<CartCheckoutDTO> editCartCheckout(@PathVariable("cartId") Long cartId, @RequestBody CartCheckoutDTO cartCheckout) {
+        CartCheckoutDTO updatedCartCheckout = cartCheckoutService.updateCartCheckout(cartId, cartCheckout);
+        return ResponseEntity.ok(updatedCartCheckout);
     }
 
-    @GetMapping("/delete/{cartId}")
-    public String deleteCartCheckoutGet(Model model, @PathVariable("cartId") Long cartId) {
-        cartCheckoutService.delete(cartId);
-        return "redirect:/cart/list";
+    @DeleteMapping("/delete/{cartId}")
+    public ResponseEntity<Void> deleteCartCheckout(@PathVariable("cartId") Long cartId) {
+        boolean deleted = cartCheckoutService.deleteCartCheckout(cartId);
+        if (deleted) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
