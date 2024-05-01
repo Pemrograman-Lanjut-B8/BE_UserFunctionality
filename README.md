@@ -49,11 +49,11 @@ Berikut ini beberapa alasan kami memilih Microservice Software Architecture:
 5. Skalabilitas: _Microservice architecture_ memungkinkan skalabilitas yang lebih baik. Hal tersebut disebabkan pemecahan fungsional yang diterapkan pada _software architecture_ ini.
 
 _Microservice_ : </br>
-- `Review & Rating` berguna agar pengguna dapat memberikan ulasan dan memberikan penilaian (dari skala 1-10) terhadap buku yang telah dibaca atau dibeli.
-  Keduanya termasuk ke dalam satu _microservice_ karena memiliki keterkaitan erat satu sama lain.
-  Sebagai contoh, saat pengguna ingin memberikan ulasan, maka ia harus sekaligus memberikan penilaian terhadap buku tersebut juga.
+- `Review & Rating` berguna agar pengguna dapat memberikan ulasan dan memberikan penilaian (dari skala 1-10) terhadap buku yang telah dibaca atau dibeli. 
+Keduanya termasuk ke dalam satu _microservice_ karena memiliki keterkaitan erat satu sama lain. 
+Sebagai contoh, saat pengguna ingin memberikan ulasan, maka ia harus sekaligus memberikan penilaian terhadap buku tersebut juga.
 
-- `Landing Page` merupakan fitur utama yang berfungsi sebagai titik masuk pertama bagi pengguna ke dalam aplikasi.
-  Fitur ini dirancang untuk menyajikan ringkasan informasi dan konten yang relevan, seperti penawaran produk terbaru, artikel terkini, atau fitur utama dari aplikasi tersebut. Dalam konteks mikro-layanan,
-  `Landing Page` dapat dipecah menjadi komponen-komponen terpisah yang masing-masing mengelola fungsionalitas tertentu. Misalnya, layanan dapat bertanggung jawab atas pengelolaan konten statis, pembaruan data dinamis, atau interaksi pengguna.
-  Dengan pendekatan ini, pengembang dapat mencapai skalabilitas, fleksibilitas, dan pemeliharaan yang lebih baik. Ini memungkinkan aplikasi untuk dengan mudah dikelola, dikembangkan, dan diperbarui seiring waktu, sesuai dengan kebutuhan pengguna dan perubahan pasar.
+- `Landing Page` merupakan fitur utama yang berfungsi sebagai titik masuk pertama bagi pengguna ke dalam aplikasi. 
+Fitur ini dirancang untuk menyajikan ringkasan informasi dan konten yang relevan, seperti penawaran produk terbaru, artikel terkini, atau fitur utama dari aplikasi tersebut. Dalam konteks mikro-layanan, 
+`Landing Page` dapat dipecah menjadi komponen-komponen terpisah yang masing-masing mengelola fungsionalitas tertentu. Misalnya, layanan dapat bertanggung jawab atas pengelolaan konten statis, pembaruan data dinamis, atau interaksi pengguna.
+Dengan pendekatan ini, pengembang dapat mencapai skalabilitas, fleksibilitas, dan pemeliharaan yang lebih baik. Ini memungkinkan aplikasi untuk dengan mudah dikelola, dikembangkan, dan diperbarui seiring waktu, sesuai dengan kebutuhan pengguna dan perubahan pasar.
