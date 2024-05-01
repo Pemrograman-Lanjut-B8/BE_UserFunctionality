@@ -13,9 +13,9 @@ public class BookRepository {
     public List<Book> getAllBooks() {
         // Dummy data for now
         List<Book> books = new ArrayList<>();
-        books.add(new Book(1L, "Book A", "Author A", "Description for Book A"));
-        books.add(new Book(2L, "Book B", "Author B", "Description for Book B"));
-        books.add(new Book(3L, "Book C", "Author C", "Description for Book C"));
+        books.add(new Book(1L, "Book A", "Author A", "Description for Book A", 4.5));
+        books.add(new Book(2L, "Book B", "Author B", "Description for Book B", 4.6));
+        books.add(new Book(3L, "Book C", "Author C", "Description for Book C", 4.8));
         return books;
     }
 }

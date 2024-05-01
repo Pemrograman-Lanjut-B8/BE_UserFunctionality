@@ -11,12 +11,14 @@ public class Book {
     private String title;
     private String author;
     private String description;
-
-    public Book(Long id, String title, String author, String description) {
+    private double rating;
+    
+    public Book(Long id, String title, String author, String description, Double rating) {
         this.id = id;
         this.title = title;
         this.author = author;
         this.description = description;
+        this.rating = rating;
     }
 
 }

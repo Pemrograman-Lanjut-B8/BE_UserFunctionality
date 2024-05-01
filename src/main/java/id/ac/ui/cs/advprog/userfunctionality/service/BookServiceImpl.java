@@ -4,7 +4,11 @@ import id.ac.ui.cs.advprog.userfunctionality.model.Book;
 import id.ac.ui.cs.advprog.userfunctionality.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -16,4 +20,17 @@ public class BookServiceImpl implements BookService {
     public List<Book> getAllBooks() {
         return bookRepository.getAllBooks();
     }
+
+    public List<Book> getTopRatedBooks() {
+        List<Book> allBooks = bookRepository.getAllBooks();
+
+        if (allBooks.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return allBooks.stream()
+                .sorted(Comparator.comparing(Book::getRating).reversed())
+                .collect(Collectors.toList());
+    }
+
 }
