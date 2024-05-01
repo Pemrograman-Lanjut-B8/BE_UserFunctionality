@@ -25,31 +25,31 @@ public class CartCheckoutController {
         return ResponseEntity.ok(checkoutDTO);
     }
 
-    @PostMapping("/create")
+    @PostMapping("/createCart")
     public ResponseEntity<CartCheckoutDTO> createCartCheckout(@RequestBody CartCheckoutDTO cartCheckout) {
         CartCheckoutDTO createdCartCheckout = cartCheckoutService.createCartCheckout(cartCheckout);
         return ResponseEntity.ok(createdCartCheckout);
     }
 
-    @GetMapping("/list")
+    @GetMapping("/cartList")
     public ResponseEntity<List<CartCheckoutDTO>> cartCheckoutList() {
         List<CartCheckoutDTO> allCartCheckouts = cartCheckoutService.findAll();
         return ResponseEntity.ok(allCartCheckouts);
     }
 
-    @GetMapping("/edit/{cartId}")
+    @GetMapping("/editCart/{cartId}")
     public ResponseEntity<CartCheckoutDTO> editCartCheckoutPage(@PathVariable("cartId") Long cartId) {
         CartCheckoutDTO cartCheckout = cartCheckoutService.findCartCheckoutById(cartId);
         return ResponseEntity.ok(cartCheckout);
     }
 
-    @PutMapping("/edit/{cartId}")
+    @PutMapping("/editCart/{cartId}")
     public ResponseEntity<CartCheckoutDTO> editCartCheckout(@PathVariable("cartId") Long cartId, @RequestBody CartCheckoutDTO cartCheckout) {
         CartCheckoutDTO updatedCartCheckout = cartCheckoutService.updateCartCheckout(cartId, cartCheckout);
         return ResponseEntity.ok(updatedCartCheckout);
     }
 
-    @DeleteMapping("/delete/{cartId}")
+    @DeleteMapping("/deleteCart/{cartId}")
     public ResponseEntity<Void> deleteCartCheckout(@PathVariable("cartId") Long cartId) {
         boolean deleted = cartCheckoutService.deleteCartCheckout(cartId);
         if (deleted) {
