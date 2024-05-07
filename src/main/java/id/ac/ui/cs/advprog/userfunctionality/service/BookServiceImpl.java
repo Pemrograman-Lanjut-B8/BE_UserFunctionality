@@ -16,22 +16,27 @@ public class BookServiceImpl implements BookService {
     @Autowired
     private BookRepository bookRepository;
 
+//    @Override
+//    public List<Book> getAllBooks() {
+//
+//        return bookRepository.getAllBooks();
+//    }
+//
+//    public List<Book> getTopRatedBooks() {
+//        List<Book> allBooks = bookRepository.getAllBooks();
+//
+//        if (allBooks.isEmpty()) {
+//            return Collections.emptyList();
+//        }
+//
+//        return allBooks.stream()
+//                .sorted(Comparator.comparing(Book::getRating).reversed())
+//                .collect(Collectors.toList());
+//    }
+
     @Override
-    public List<Book> getAllBooks() {
+    public List<Book> getBookRecommendation() {
 
-        return bookRepository.getAllBooks();
+        return bookRepository.findTop5ByOrderByRatingDesc();
     }
-
-    public List<Book> getTopRatedBooks() {
-        List<Book> allBooks = bookRepository.getAllBooks();
-
-        if (allBooks.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        return allBooks.stream()
-                .sorted(Comparator.comparing(Book::getRating).reversed())
-                .collect(Collectors.toList());
-    }
-
 }

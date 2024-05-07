@@ -16,16 +16,16 @@ public class TopRatedBookFactory {
         this.bookService = bookService;
     }
 
-    public List<Book> getTopRatedBooks() {
-        List<Book> allBooks = bookService.getAllBooks();
-
-        if (allBooks.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        return allBooks.stream()
-                .sorted(Comparator.comparing(Book::getRating).reversed())
-                .collect(Collectors.toList());
-    }
+//    public List<Book> getTopRatedBooks() {
+//        List<Book> allBooks = bookService.getAllBooks();
+//
+//        if (allBooks.isEmpty()) {
+//            return Collections.emptyList();
+//        }
+//
+//        return allBooks.stream()
+//                .sorted(Comparator.comparing(Book::getRating).reversed())
+//                .collect(Collectors.toList());
+//    }
 
 }

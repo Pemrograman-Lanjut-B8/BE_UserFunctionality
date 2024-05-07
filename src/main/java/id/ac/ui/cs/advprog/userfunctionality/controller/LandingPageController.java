@@ -18,10 +18,10 @@ public class LandingPageController {
         this.bookService = bookService;
     }
 
-    @GetMapping("/list")
-    public String showLandingPage(Model model) {
-        List<Book> books = bookService.getAllBooks();
-        model.addAttribute("books", books);
-        return "LandingPage";
-    }
+//    @GetMapping("/list")
+//    public String showLandingPage(Model model) {
+//        List<Book> books = bookService.getAllBooks();
+//        model.addAttribute("books", books);
+//        return "LandingPage";
+//    }
 }
