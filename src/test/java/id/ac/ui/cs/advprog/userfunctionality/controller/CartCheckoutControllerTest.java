@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class CartCheckoutControllerTest {
 
@@ -37,7 +38,8 @@ public class CartCheckoutControllerTest {
     public void testGetCartCheckout() throws Exception {
         CartCheckoutDTO cartCheckoutDTO = new CartCheckoutDTO();
         cartCheckoutDTO.setCartId(1L);
-        when(cartCheckoutService.findCartCheckoutById(1L)).thenReturn(cartCheckoutDTO);
+        when(cartCheckoutService.findCartCheckoutById(1L))
+                .thenReturn(CompletableFuture.completedFuture(cartCheckoutDTO));
 
         mockMvc.perform(get("/cart/checkout/1"))
                 .andExpect(status().isOk())
@@ -46,7 +48,8 @@ public class CartCheckoutControllerTest {
 
     @Test
     public void testGetCartCheckoutNotFound() throws Exception {
-        when(cartCheckoutService.findCartCheckoutById(1L)).thenReturn(null);
+        when(cartCheckoutService.findCartCheckoutById(1L))
+                .thenReturn(CompletableFuture.completedFuture(null));
 
         mockMvc.perform(get("/cart/checkout/1"))
                 .andExpect(status().isNotFound());
@@ -56,7 +59,8 @@ public class CartCheckoutControllerTest {
     public void testCreateCartCheckout() throws Exception {
         CartCheckoutDTO cartCheckoutDTO = new CartCheckoutDTO();
         cartCheckoutDTO.setCartId(1L);
-        when(cartCheckoutService.createCartCheckout(any(CartCheckoutDTO.class))).thenReturn(cartCheckoutDTO);
+        when(cartCheckoutService.createCartCheckout(any(CartCheckoutDTO.class)))
+                .thenReturn(CompletableFuture.completedFuture(cartCheckoutDTO));
 
         mockMvc.perform(post("/cart/createCart")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -69,7 +73,8 @@ public class CartCheckoutControllerTest {
     public void testCartCheckoutList() throws Exception {
         List<CartCheckoutDTO> allCartCheckouts = new ArrayList<>();
         allCartCheckouts.add(new CartCheckoutDTO());
-        when(cartCheckoutService.findAll()).thenReturn(allCartCheckouts);
+        when(cartCheckoutService.findAll())
+                .thenReturn(CompletableFuture.completedFuture(allCartCheckouts));
 
         mockMvc.perform(get("/cart/list"))
                 .andExpect(status().isOk())
@@ -80,7 +85,8 @@ public class CartCheckoutControllerTest {
     public void testEditCartCheckout() throws Exception {
         CartCheckoutDTO cartCheckoutDTO = new CartCheckoutDTO();
         cartCheckoutDTO.setCartId(1L);
-        when(cartCheckoutService.updateCartCheckout(eq(1L), any(CartCheckoutDTO.class))).thenReturn(cartCheckoutDTO);
+        when(cartCheckoutService.updateCartCheckout(eq(1L), any(CartCheckoutDTO.class)))
+                .thenReturn(CompletableFuture.completedFuture(cartCheckoutDTO));
 
         mockMvc.perform(put("/cart/edit/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -91,7 +97,8 @@ public class CartCheckoutControllerTest {
 
     @Test
     public void testEditCartCheckoutNotFound() throws Exception {
-        when(cartCheckoutService.updateCartCheckout(eq(1L), any(CartCheckoutDTO.class))).thenReturn(null);
+        when(cartCheckoutService.updateCartCheckout(eq(1L), any(CartCheckoutDTO.class)))
+                .thenReturn(CompletableFuture.completedFuture(null));
 
         mockMvc.perform(put("/cart/edit/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -101,7 +108,8 @@ public class CartCheckoutControllerTest {
 
     @Test
     public void testDeleteCartCheckout() throws Exception {
-        when(cartCheckoutService.deleteCartCheckout(1L)).thenReturn(true);
+        when(cartCheckoutService.deleteCartCheckout(1L))
+                .thenReturn(CompletableFuture.completedFuture(true));
 
         mockMvc.perform(delete("/cart/delete/1"))
                 .andExpect(status().isNoContent());
@@ -109,7 +117,8 @@ public class CartCheckoutControllerTest {
 
     @Test
     public void testDeleteCartCheckoutNotFound() throws Exception {
-        when(cartCheckoutService.deleteCartCheckout(1L)).thenReturn(false);
+        when(cartCheckoutService.deleteCartCheckout(1L))
+                .thenReturn(CompletableFuture.completedFuture(false));
 
         mockMvc.perform(delete("/cart/delete/1"))
                 .andExpect(status().isNotFound());

@@ -5,6 +5,7 @@ import id.ac.ui.cs.advprog.userfunctionality.model.CartCheckout;
 import id.ac.ui.cs.advprog.userfunctionality.repository.CartCheckoutRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,9 +14,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class CartCheckoutServiceTest {
 
@@ -23,7 +24,7 @@ public class CartCheckoutServiceTest {
     private CartCheckoutRepository cartCheckoutRepository;
 
     @InjectMocks
-    private CartCheckoutService cartCheckoutService = new CartCheckoutServiceImpl();
+    private CartCheckoutServiceImpl cartCheckoutService;
 
     @BeforeEach
     public void setUp() {
@@ -31,7 +32,7 @@ public class CartCheckoutServiceTest {
     }
 
     @Test
-    public void testCreateCartCheckout() {
+    public void testCreateCartCheckout() throws ExecutionException, InterruptedException {
         CartCheckoutDTO cartCheckoutDTO = new CartCheckoutDTO();
         cartCheckoutDTO.setCartId(1L);
         cartCheckoutDTO.setUserId("user123");
@@ -44,34 +45,32 @@ public class CartCheckoutServiceTest {
 
         when(cartCheckoutRepository.create(any())).thenReturn(cartCheckout);
 
-        CartCheckoutDTO createdCartCheckoutDTO = cartCheckoutService.createCartCheckout(cartCheckoutDTO);
+        CompletableFuture<CartCheckoutDTO> future = cartCheckoutService.createCartCheckout(cartCheckoutDTO);
+        CartCheckoutDTO createdCartCheckoutDTO = future.get();
 
         assertEquals("user123", createdCartCheckoutDTO.getUserId());
+        assertEquals(100.0, createdCartCheckoutDTO.getTotalPrice());
     }
 
     @Test
-    public void testFindCartCheckoutById() {
+    public void testFindCartCheckoutById() throws ExecutionException, InterruptedException {
         Long cartId = 1L;
         CartCheckout cartCheckout = new CartCheckout();
         cartCheckout.setCartId(1L);
         cartCheckout.setUserId("user123");
         cartCheckout.setTotalPrice(100.0);
 
-        CartCheckoutDTO cartCheckoutDTO = new CartCheckoutDTO();
-        cartCheckoutDTO.setCartId(cartCheckout.getCartId());
-        cartCheckoutDTO.setUserId(cartCheckout.getUserId());
-        cartCheckoutDTO.setTotalPrice(cartCheckout.getTotalPrice());
-
         when(cartCheckoutRepository.findById(cartId)).thenReturn(Optional.of(cartCheckout));
 
-        CartCheckoutDTO foundCartCheckoutDTO = cartCheckoutService.findCartCheckoutById(cartId);
+        CompletableFuture<CartCheckoutDTO> future = cartCheckoutService.findCartCheckoutById(cartId);
+        CartCheckoutDTO foundCartCheckoutDTO = future.get();
 
         assertNotNull(foundCartCheckoutDTO);
         assertEquals("user123", foundCartCheckoutDTO.getUserId());
     }
 
     @Test
-    public void testUpdateCartCheckout() {
+    public void testUpdateCartCheckout() throws ExecutionException, InterruptedException {
         Long cartId = 1L;
         CartCheckout existingCartCheckout = new CartCheckout();
         existingCartCheckout.setCartId(cartId);
@@ -84,12 +83,13 @@ public class CartCheckoutServiceTest {
         updateDTO.setTotalPrice(150.0);
 
         when(cartCheckoutRepository.findById(cartId)).thenReturn(Optional.of(existingCartCheckout));
-        when(cartCheckoutRepository.update(eq(cartId), any(CartCheckout.class))).thenReturn(existingCartCheckout);
+        when(cartCheckoutRepository.update(eq(cartId), any())).thenReturn(existingCartCheckout);
 
         existingCartCheckout.setUserId(updateDTO.getUserId());
         existingCartCheckout.setTotalPrice(updateDTO.getTotalPrice());
 
-        CartCheckoutDTO updatedCartCheckout = cartCheckoutService.updateCartCheckout(cartId, updateDTO);
+        CompletableFuture<CartCheckoutDTO> future = cartCheckoutService.updateCartCheckout(cartId, updateDTO);
+        CartCheckoutDTO updatedCartCheckout = future.get();
 
         assertNotNull(updatedCartCheckout);
         assertEquals("updatedUser123", updatedCartCheckout.getUserId());
@@ -97,22 +97,24 @@ public class CartCheckoutServiceTest {
     }
 
     @Test
-    public void testDeleteCartCheckout() {
+    public void testDeleteCartCheckout() throws ExecutionException, InterruptedException {
         Long cartId = 1L;
         when(cartCheckoutRepository.delete(cartId)).thenReturn(true);
 
-        boolean result = cartCheckoutService.deleteCartCheckout(cartId);
+        CompletableFuture<Boolean> future = cartCheckoutService.deleteCartCheckout(cartId);
+        boolean result = future.get();
 
         assertTrue(result);
         verify(cartCheckoutRepository).delete(cartId);
     }
 
     @Test
-    public void testDeleteCartCheckoutNotFound() {
+    public void testDeleteCartCheckoutNotFound() throws ExecutionException, InterruptedException {
         Long cartId = 99L;
         when(cartCheckoutRepository.delete(cartId)).thenReturn(false);
 
-        boolean result = cartCheckoutService.deleteCartCheckout(cartId);
+        CompletableFuture<Boolean> future = cartCheckoutService.deleteCartCheckout(cartId);
+        boolean result = future.get();
 
         assertFalse(result);
     }
