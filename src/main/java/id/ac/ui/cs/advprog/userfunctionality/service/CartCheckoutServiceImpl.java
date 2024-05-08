@@ -6,9 +6,11 @@ import id.ac.ui.cs.advprog.userfunctionality.model.CartItems;
 import id.ac.ui.cs.advprog.userfunctionality.dto.CartItemsDTO;
 import id.ac.ui.cs.advprog.userfunctionality.repository.CartCheckoutRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,37 +20,48 @@ public class CartCheckoutServiceImpl implements CartCheckoutService {
     private CartCheckoutRepository cartCheckoutRepository;
 
     @Override
-    public CartCheckoutDTO createCartCheckout(CartCheckoutDTO cartCheckoutDTO) {
-        CartCheckout cartCheckout = toCartCheckoutEntity(cartCheckoutDTO);
-        CartCheckout savedCheckout = cartCheckoutRepository.create(cartCheckout);
-        return toCartCheckoutDTO(savedCheckout);
+    @Async
+    public CompletableFuture<CartCheckoutDTO> createCartCheckout(CartCheckoutDTO cartCheckoutDTO) {
+        return CompletableFuture.supplyAsync(() -> {
+            CartCheckout cartCheckout = toCartCheckoutEntity(cartCheckoutDTO);
+            CartCheckout savedCheckout = cartCheckoutRepository.create(cartCheckout);
+            return toCartCheckoutDTO(savedCheckout);
+        });
     }
 
     @Override
-    public List<CartCheckoutDTO> findAll() {
-        return cartCheckoutRepository.findAll().stream()
+    @Async
+    public CompletableFuture<List<CartCheckoutDTO>> findAll() {
+        return CompletableFuture.supplyAsync(() -> cartCheckoutRepository.findAll().stream()
                 .map(this::toCartCheckoutDTO)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     @Override
-    public CartCheckoutDTO findCartCheckoutById(Long cartId) {
-        CartCheckout cartCheckout = cartCheckoutRepository.findById(cartId)
-                .orElseThrow(() -> new IllegalArgumentException("Cart not found with id: " + cartId));
-        return toCartCheckoutDTO(cartCheckout);
+    @Async
+    public CompletableFuture<CartCheckoutDTO> findCartCheckoutById(Long cartId) {
+        return CompletableFuture.supplyAsync(() -> {
+            CartCheckout cartCheckout = cartCheckoutRepository.findById(cartId)
+                    .orElseThrow(() -> new IllegalArgumentException("Cart not found with id: " + cartId));
+            return toCartCheckoutDTO(cartCheckout);
+        });
     }
 
     @Override
-    public CartCheckoutDTO updateCartCheckout(Long cartId, CartCheckoutDTO cartCheckoutDTO) {
-        CartCheckout cartCheckout = toCartCheckoutEntity(cartCheckoutDTO);
-        cartCheckout.setCartId(cartId);
-        CartCheckout updatedCheckout = cartCheckoutRepository.update(cartId, cartCheckout);
-        return toCartCheckoutDTO(updatedCheckout);
+    @Async
+    public CompletableFuture<CartCheckoutDTO> updateCartCheckout(Long cartId, CartCheckoutDTO cartCheckoutDTO) {
+        return CompletableFuture.supplyAsync(() -> {
+            CartCheckout cartCheckout = toCartCheckoutEntity(cartCheckoutDTO);
+            cartCheckout.setCartId(cartId);
+            CartCheckout updatedCheckout = cartCheckoutRepository.update(cartId, cartCheckout);
+            return toCartCheckoutDTO(updatedCheckout);
+        });
     }
 
     @Override
-    public boolean deleteCartCheckout(Long cartId) {
-        return cartCheckoutRepository.delete(cartId);
+    @Async
+    public CompletableFuture<Boolean> deleteCartCheckout(Long cartId) {
+        return CompletableFuture.supplyAsync(() -> cartCheckoutRepository.delete(cartId));
     }
 
     // Helper method to convert DTO to entity
