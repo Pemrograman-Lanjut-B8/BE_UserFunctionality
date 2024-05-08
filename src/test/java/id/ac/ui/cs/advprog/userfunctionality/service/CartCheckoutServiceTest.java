@@ -1,19 +1,18 @@
 package id.ac.ui.cs.advprog.userfunctionality.service;
 
+import id.ac.ui.cs.advprog.userfunctionality.dto.CartCheckoutDTO;
 import id.ac.ui.cs.advprog.userfunctionality.model.CartCheckout;
-import id.ac.ui.cs.advprog.userfunctionality.model.CartItems;
 import id.ac.ui.cs.advprog.userfunctionality.repository.CartCheckoutRepository;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,93 +32,88 @@ public class CartCheckoutServiceTest {
 
     @Test
     public void testCreateCartCheckout() {
-        // Prepare dummy data
+        CartCheckoutDTO cartCheckoutDTO = new CartCheckoutDTO();
+        cartCheckoutDTO.setCartId(1L);
+        cartCheckoutDTO.setUserId("user123");
+        cartCheckoutDTO.setTotalPrice(100.0);
+
+        CartCheckout cartCheckout = new CartCheckout();
+        cartCheckout.setCartId(cartCheckoutDTO.getCartId());
+        cartCheckout.setUserId(cartCheckoutDTO.getUserId());
+        cartCheckout.setTotalPrice(cartCheckoutDTO.getTotalPrice());
+
+        when(cartCheckoutRepository.create(any())).thenReturn(cartCheckout);
+
+        CartCheckoutDTO createdCartCheckoutDTO = cartCheckoutService.createCartCheckout(cartCheckoutDTO);
+
+        assertEquals("user123", createdCartCheckoutDTO.getUserId());
+    }
+
+    @Test
+    public void testFindCartCheckoutById() {
+        Long cartId = 1L;
         CartCheckout cartCheckout = new CartCheckout();
         cartCheckout.setCartId(1L);
         cartCheckout.setUserId("user123");
         cartCheckout.setTotalPrice(100.0);
-        List<CartItems> items = new ArrayList<>();
-        items.add(new CartItems(1L, "Title 1", 50.0, 2));
-        items.add(new CartItems(2L, "Title 2", 30.0, 1));
-        cartCheckout.setItems(items);
 
-        // Mock the behavior of the CartCheckoutRepository
-        when(cartCheckoutRepository.create(cartCheckout)).thenReturn(cartCheckout);
+        CartCheckoutDTO cartCheckoutDTO = new CartCheckoutDTO();
+        cartCheckoutDTO.setCartId(cartCheckout.getCartId());
+        cartCheckoutDTO.setUserId(cartCheckout.getUserId());
+        cartCheckoutDTO.setTotalPrice(cartCheckout.getTotalPrice());
 
-        // Call the method under test
-        CartCheckout createdCartCheckout = cartCheckoutService.create(cartCheckout);
+        when(cartCheckoutRepository.findById(cartId)).thenReturn(Optional.of(cartCheckout));
 
-        // Verify the result
-        assertEquals(cartCheckout, createdCartCheckout);
-    }
+        CartCheckoutDTO foundCartCheckoutDTO = cartCheckoutService.findCartCheckoutById(cartId);
 
-
-    @Test
-    public void testFindAll() {
-        // Prepare dummy data
-        List<CartCheckout> expectedCartCheckouts = new ArrayList<>();
-        // Add some CartCheckouts if needed
-
-        // Mock the behavior of the CartCheckoutRepository
-        when(cartCheckoutRepository.findAll()).thenReturn(expectedCartCheckouts);
-
-        // Call the method under test
-        List<CartCheckout> actualCartCheckouts = cartCheckoutService.findAll();
-
-        // Verify the result
-        assertEquals(expectedCartCheckouts, actualCartCheckouts);
+        assertNotNull(foundCartCheckoutDTO);
+        assertEquals("user123", foundCartCheckoutDTO.getUserId());
     }
 
     @Test
-    public void testFindById() {
-        // Prepare dummy data
+    public void testUpdateCartCheckout() {
         Long cartId = 1L;
-        CartCheckout expectedCartCheckout = new CartCheckout();
-        // Set properties of expectedCartCheckout if needed
+        CartCheckout existingCartCheckout = new CartCheckout();
+        existingCartCheckout.setCartId(cartId);
+        existingCartCheckout.setUserId("user123");
+        existingCartCheckout.setTotalPrice(100.0);
 
-        // Mock the behavior of the CartCheckoutRepository
-        when(cartCheckoutRepository.findById(cartId)).thenReturn(Optional.of(expectedCartCheckout));
+        CartCheckoutDTO updateDTO = new CartCheckoutDTO();
+        updateDTO.setCartId(cartId);
+        updateDTO.setUserId("updatedUser123");
+        updateDTO.setTotalPrice(150.0);
 
-        // Call the method under test
-        Optional<CartCheckout> actualCartCheckout = cartCheckoutService.findById(cartId);
+        when(cartCheckoutRepository.findById(cartId)).thenReturn(Optional.of(existingCartCheckout));
+        when(cartCheckoutRepository.update(eq(cartId), any(CartCheckout.class))).thenReturn(existingCartCheckout);
 
-        // Verify the result
-        assertTrue(actualCartCheckout.isPresent());
-        assertEquals(expectedCartCheckout, actualCartCheckout.get());
+        existingCartCheckout.setUserId(updateDTO.getUserId());
+        existingCartCheckout.setTotalPrice(updateDTO.getTotalPrice());
+
+        CartCheckoutDTO updatedCartCheckout = cartCheckoutService.updateCartCheckout(cartId, updateDTO);
+
+        assertNotNull(updatedCartCheckout);
+        assertEquals("updatedUser123", updatedCartCheckout.getUserId());
+        assertEquals(150.0, updatedCartCheckout.getTotalPrice());
     }
 
     @Test
-    public void testUpdate() {
-        // Prepare dummy data
+    public void testDeleteCartCheckout() {
         Long cartId = 1L;
-        CartCheckout updatedCartCheckout = new CartCheckout();
-        // Set properties of updatedCartCheckout if needed
-
-        // Mock the behavior of the CartCheckoutRepository
-        when(cartCheckoutRepository.findById(cartId)).thenReturn(Optional.of(updatedCartCheckout));
-        when(cartCheckoutRepository.update(cartId, updatedCartCheckout)).thenReturn(updatedCartCheckout);
-
-        // Call the method under test
-        CartCheckout returnedCartCheckout = cartCheckoutService.update(cartId, updatedCartCheckout);
-
-        // Verify the result
-        assertEquals(updatedCartCheckout, returnedCartCheckout);
-    }
-
-    @Test
-    public void testDelete() {
-        // Prepare dummy data
-        Long cartId = 1L;
-
-        // Mock the behavior of the CartCheckoutRepository
         when(cartCheckoutRepository.delete(cartId)).thenReturn(true);
 
-        // Call the method under test
-        boolean isDeleted = cartCheckoutService.delete(cartId);
+        boolean result = cartCheckoutService.deleteCartCheckout(cartId);
 
-        // Verify the result
-        assertTrue(isDeleted);
+        assertTrue(result);
         verify(cartCheckoutRepository).delete(cartId);
     }
-}
 
+    @Test
+    public void testDeleteCartCheckoutNotFound() {
+        Long cartId = 99L;
+        when(cartCheckoutRepository.delete(cartId)).thenReturn(false);
+
+        boolean result = cartCheckoutService.deleteCartCheckout(cartId);
+
+        assertFalse(result);
+    }
+}
