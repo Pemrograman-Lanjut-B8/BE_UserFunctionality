@@ -10,11 +10,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,8 +50,8 @@ class ReviewRatingServiceImplTest {
     @Test
     void testCreateReviewRating() {
         when(reviewRatingRepository.create(any(ReviewRating.class))).thenReturn(reviewRating1);
-        ReviewRating createdReviewRating = reviewRatingService.createReviewRating(reviewRating1);
-        assertEquals(reviewRating1, createdReviewRating);
+        CompletableFuture<ReviewRating> future = reviewRatingService.createReviewRating(reviewRating1);
+        assertEquals(reviewRating1, future.join());
         verify(reviewRatingRepository, times(1)).create(reviewRating1);
     }
 
@@ -62,10 +63,8 @@ class ReviewRatingServiceImplTest {
 
         when(reviewRatingRepository.findAll()).thenReturn(reviewRatings.iterator());
 
-        List<ReviewRating> foundReviewRatings = reviewRatingService.findAll();
-
-        assertEquals(2, foundReviewRatings.size());
-        assertEquals(reviewRatings, foundReviewRatings);
+        CompletableFuture<List<ReviewRating>> future = reviewRatingService.findAll();
+        assertEquals(reviewRatings, future.join());
         verify(reviewRatingRepository, times(1)).findAll();
     }
 
@@ -73,9 +72,8 @@ class ReviewRatingServiceImplTest {
     void testFindById() {
         when(reviewRatingRepository.findById("1")).thenReturn(Optional.of(reviewRating1));
 
-        Optional<ReviewRating> foundReviewRating = reviewRatingService.findById("1");
-
-        assertEquals(Optional.of(reviewRating1), foundReviewRating);
+        CompletableFuture<Optional<ReviewRating>> future = reviewRatingService.findById("1");
+        assertEquals(Optional.of(reviewRating1), future.join());
         verify(reviewRatingRepository, times(1)).findById("1");
     }
 
@@ -84,9 +82,8 @@ class ReviewRatingServiceImplTest {
         when(reviewRatingRepository.findById("1")).thenReturn(Optional.of(reviewRating1));
         when(reviewRatingRepository.update("1", reviewRating1)).thenReturn(reviewRating1);
 
-        ReviewRating updatedReviewRating = reviewRatingService.updateReviewRating("1", reviewRating1);
-
-        assertEquals(reviewRating1, updatedReviewRating);
+        CompletableFuture<ReviewRating> future = reviewRatingService.updateReviewRating("1", reviewRating1);
+        assertEquals(reviewRating1, future.join());
         verify(reviewRatingRepository, times(1)).findById("1");
         verify(reviewRatingRepository, times(1)).update("1", reviewRating1);
     }
@@ -95,8 +92,8 @@ class ReviewRatingServiceImplTest {
     void testDeleteReviewRating() {
         doNothing().when(reviewRatingRepository).delete("1");
 
-        reviewRatingService.deleteReviewRating("1");
-
+        CompletableFuture<Void> future = reviewRatingService.deleteReviewRating("1");
+        future.join();
         verify(reviewRatingRepository, times(1)).delete("1");
     }
 }
