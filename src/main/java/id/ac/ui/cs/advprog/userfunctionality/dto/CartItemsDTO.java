@@ -1,4 +1,4 @@
-package id.ac.ui.cs.advprog.userfunctionality.model;
+package id.ac.ui.cs.advprog.userfunctionality.dto;
 
 import lombok.Getter;
 import lombok.Setter;

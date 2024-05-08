@@ -1,7 +1,6 @@
 package id.ac.ui.cs.advprog.userfunctionality.service;
 
-import id.ac.ui.cs.advprog.userfunctionality.model.CartCheckout;
-import id.ac.ui.cs.advprog.userfunctionality.model.CartCheckoutDTO;
+import id.ac.ui.cs.advprog.userfunctionality.dto.CartCheckoutDTO;
 
 import java.util.List;
 

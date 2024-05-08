@@ -1,9 +1,9 @@
 package id.ac.ui.cs.advprog.userfunctionality.service;
 
 import id.ac.ui.cs.advprog.userfunctionality.model.CartCheckout;
-import id.ac.ui.cs.advprog.userfunctionality.model.CartCheckoutDTO;
+import id.ac.ui.cs.advprog.userfunctionality.dto.CartCheckoutDTO;
 import id.ac.ui.cs.advprog.userfunctionality.model.CartItems;
-import id.ac.ui.cs.advprog.userfunctionality.model.CartItemsDTO;
+import id.ac.ui.cs.advprog.userfunctionality.dto.CartItemsDTO;
 import id.ac.ui.cs.advprog.userfunctionality.repository.CartCheckoutRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
