@@ -3,56 +3,38 @@ package id.ac.ui.cs.advprog.userfunctionality.controller;
 import id.ac.ui.cs.advprog.userfunctionality.model.ReviewRating;
 import id.ac.ui.cs.advprog.userfunctionality.service.ReviewRatingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.concurrent.CompletableFuture;
 
-import java.util.List;
-import java.util.Optional;
-
-@Controller
-@RequestMapping("/review")
+@RestController
+@RequestMapping("/api/review")
 public class ReviewRatingController {
 
     @Autowired
     private ReviewRatingService reviewRatingService;
 
-    @GetMapping("/create")
-    public String createReviewRatingPage(Model model) {
-        ReviewRating reviewRating = new ReviewRating();
-        model.addAttribute("reviewRating", reviewRating);
-        return "CreateReviewRating";
-    }
-
     @PostMapping("/create")
-    public String createReviewRatingPost(@ModelAttribute ReviewRating reviewRating, Model model) {
-        reviewRatingService.createReviewRating(reviewRating);
-        return "redirect:list";
+    public CompletableFuture<ResponseEntity<?>> createReviewRating(@RequestBody ReviewRating reviewRating) {
+        return reviewRatingService.createReviewRating(reviewRating)
+                .thenApply(createdReviewRating -> ResponseEntity.ok(createdReviewRating));
     }
 
     @GetMapping("/list")
-    public String reviewRatingListPage(Model model) {
-        List<ReviewRating> allReviewRatings = reviewRatingService.findAll();
-        model.addAttribute("reviewRatings", allReviewRatings);
-        return "ReviewRatingList";
+    public CompletableFuture<ResponseEntity<?>> reviewRatingList() {
+        return reviewRatingService.findAll()
+                .thenApply(allReviewRatings -> ResponseEntity.ok(allReviewRatings));
     }
 
-    @GetMapping("/edit/{reviewId}")
-    public String editReviewRatingPage(Model model, @PathVariable("reviewId") String reviewId) {
-        Optional<ReviewRating> reviewRating = reviewRatingService.findById(reviewId);
-        reviewRating.ifPresent(value -> model.addAttribute("reviewRating", value));
-        return "EditReviewRating";
+    @PutMapping("/edit/{reviewId}")
+    public CompletableFuture<ResponseEntity<?>> editReviewRating(@PathVariable("reviewId") String reviewId, @RequestBody ReviewRating reviewRating) {
+        return reviewRatingService.updateReviewRating(reviewId, reviewRating)
+                .thenApply(updatedReviewRating -> ResponseEntity.ok(updatedReviewRating));
     }
 
-    @PostMapping("/edit/{reviewId}")
-    public String editReviewRatingPost(@ModelAttribute ReviewRating reviewRating, Model model, @PathVariable("reviewId") String reviewId) {
-        reviewRatingService.updateReviewRating(reviewId, reviewRating);
-        return "redirect:/review/list";
-    }
-
-    @GetMapping("/delete/{reviewId}")
-    public String deleteReviewRatingGet(Model model, @PathVariable("reviewId") String reviewId) {
-        reviewRatingService.deleteReviewRating(reviewId);
-        return "redirect:/review/list";
+    @DeleteMapping("/delete/{reviewId}")
+    public CompletableFuture<ResponseEntity<?>> deleteReviewRating(@PathVariable("reviewId") String reviewId) {
+        return reviewRatingService.deleteReviewRating(reviewId)
+                .thenApply(deleted -> ResponseEntity.ok().build());
     }
 }
