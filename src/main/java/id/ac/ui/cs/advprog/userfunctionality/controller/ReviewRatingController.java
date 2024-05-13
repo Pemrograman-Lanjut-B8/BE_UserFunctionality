@@ -33,8 +33,8 @@ public class ReviewRatingController {
     }
 
     @DeleteMapping("/delete/{reviewId}")
-    public CompletableFuture<ResponseEntity<?>> deleteReviewRating(@PathVariable("reviewId") String reviewId) {
+    public CompletableFuture<ResponseEntity<Void>> deleteReviewRating(@PathVariable("reviewId") String reviewId) {
         return reviewRatingService.deleteReviewRating(reviewId)
-                .thenApply(deleted -> ResponseEntity.ok().build());
+                .thenApply(voidResult -> ResponseEntity.noContent().build());
     }
 }

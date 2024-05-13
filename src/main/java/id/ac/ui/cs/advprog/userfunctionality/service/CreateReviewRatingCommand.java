@@ -3,6 +3,8 @@ package id.ac.ui.cs.advprog.userfunctionality.service;
 import id.ac.ui.cs.advprog.userfunctionality.model.ReviewRating;
 import id.ac.ui.cs.advprog.userfunctionality.repository.ReviewRatingRepository;
 
+import java.util.Optional;
+
 public class CreateReviewRatingCommand implements Command {
     private ReviewRating reviewRating;
     private ReviewRatingRepository reviewRatingRepository;
@@ -13,7 +15,7 @@ public class CreateReviewRatingCommand implements Command {
     }
 
     @Override
-    public void execute() {
-        reviewRatingRepository.create(reviewRating);
+    public Optional<ReviewRating> execute() {
+        return Optional.of(reviewRatingRepository.save(reviewRating));
     }
 }

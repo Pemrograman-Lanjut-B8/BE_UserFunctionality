@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
@@ -30,9 +29,9 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
     @Async
     public CompletableFuture<List<ReviewRating>> findAll() {
         return CompletableFuture.supplyAsync(() -> {
-            Iterator<ReviewRating> reviewRatingIterator = reviewRatingRepository.findAll();
+            Iterable<ReviewRating> reviewRatingIterator = reviewRatingRepository.findAll();
             List<ReviewRating> allReviewRating = new ArrayList<>();
-            reviewRatingIterator.forEachRemaining(allReviewRating::add);
+            reviewRatingIterator.forEach(allReviewRating::add);
             return allReviewRating;
         });
     }
@@ -58,4 +57,5 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
         deleteCommand.execute();
         return CompletableFuture.completedFuture(null);
     }
+
 }
