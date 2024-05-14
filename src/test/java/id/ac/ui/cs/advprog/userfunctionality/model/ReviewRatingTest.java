@@ -3,7 +3,7 @@ package id.ac.ui.cs.advprog.userfunctionality.model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ReviewRatingTest {
     private ReviewRating reviewRating;
@@ -41,5 +41,20 @@ public class ReviewRatingTest {
     @Test
     void testGetRating() {
         assertEquals(8, this.reviewRating.getRating());
+    }
+
+    @Test
+    public void testInvalidRatingLessThanZero() {
+        assertThrows(IllegalArgumentException.class, () -> new ReviewRating("novrizair", "000", "This is a review", -1));
+    }
+
+    @Test
+    public void testInvalidRatingMoreThanTen() {
+        assertThrows(IllegalArgumentException.class, () -> new ReviewRating("novrizair", "000", "This is a review", 11));
+    }
+
+    @Test
+    public void testEmptyReview() {
+        assertThrows(IllegalArgumentException.class, () -> new ReviewRating("novrizair", "000", "", 5));
     }
 }
