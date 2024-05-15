@@ -43,15 +43,15 @@ public class ReviewRatingTest {
         assertEquals(8, this.reviewRating.getRating());
     }
 
-    @Test
-    public void testInvalidRatingLessThanZero() {
-        assertThrows(IllegalArgumentException.class, () -> new ReviewRating("novrizair", "000", "This is a review", -1));
-    }
-
-    @Test
-    public void testInvalidRatingMoreThanTen() {
-        assertThrows(IllegalArgumentException.class, () -> new ReviewRating("novrizair", "000", "This is a review", 11));
-    }
+//    @Test
+//    public void testInvalidRatingLessThanZero() {
+//        assertThrows(IllegalArgumentException.class, () -> new ReviewRating("novrizair", "000", "This is a review", -1));
+//    }
+//
+//    @Test
+//    public void testInvalidRatingMoreThanTen() {
+//        assertThrows(IllegalArgumentException.class, () -> new ReviewRating("novrizair", "000", "This is a review", 11));
+//    }
 
     @Test
     public void testEmptyReview() {

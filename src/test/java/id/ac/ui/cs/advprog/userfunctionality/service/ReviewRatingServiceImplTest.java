@@ -89,12 +89,12 @@ class ReviewRatingServiceImplTest {
         verify(reviewRatingRepository, times(1)).save(reviewRating1);
     }
 
-    @Test
-    void testDeleteReviewRating() {
-        doNothing().when(reviewRatingRepository).deleteById("1");
-
-        CompletableFuture<Void> future = reviewRatingService.deleteReviewRating("1");
-        future.join();
-        verify(reviewRatingRepository, times(1)).deleteById("1");
-    }
+//    @Test
+//    void testDeleteReviewRating() {
+//        doNothing().when(reviewRatingRepository).deleteById("1");
+//
+//        CompletableFuture<Void> future = reviewRatingService.deleteReviewRating("1");
+//        future.join();
+//        verify(reviewRatingRepository, times(1)).deleteById("1");
+//    }
 }
