@@ -1,3 +1,18 @@
+package id.ac.ui.cs.advprog.userfunctionality.factory;
+
+import id.ac.ui.cs.advprog.userfunctionality.model.Book;
+import id.ac.ui.cs.advprog.userfunctionality.service.BookService;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+public class TopRatedBookFactoryTest {
+
+
 //package id.ac.ui.cs.advprog.userfunctionality.factory;
 //
 //import id.ac.ui.cs.advprog.userfunctionality.model.Book;
@@ -12,6 +27,7 @@
 //
 //public class TopRatedBookFactoryTest {
 //
+
 //    @Test
 //    public void testGetTopRatedBooks() {
 //
@@ -26,8 +42,13 @@
 //        assertFalse(topRatedBooks.isEmpty());
 //
 //    }
+
+
+    // Kelas mock sederhana untuk BookService
+
 //
 //    // Kelas mock sederhana untuk BookService
+
 //    private class MockBookService implements BookService {
 //        @Override
 //        public List<Book> getAllBooks() {
@@ -50,4 +71,5 @@
 //            return mockBooks;
 //        }
 //    }
-//}
+}
+
