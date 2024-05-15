@@ -22,14 +22,21 @@ public class CartCheckoutController {
     @GetMapping("/checkout/{cartId}")
     public CompletableFuture<ResponseEntity<CartCheckoutDTO>> getCartCheckout(@PathVariable Long cartId) {
         return cartCheckoutService.findCartCheckoutById(cartId)
-                .thenApply(checkoutDTO ->
-                        checkoutDTO != null ? ResponseEntity.ok(checkoutDTO) : ResponseEntity.notFound().build());
+                .thenCompose(checkoutDTO -> {
+                    if (checkoutDTO != null) {
+                        return cartCheckoutService.storeCheckedOutBooks(checkoutDTO)
+                                .thenApply(v -> ResponseEntity.ok(checkoutDTO));
+                    } else {
+                        return CompletableFuture.completedFuture(ResponseEntity.notFound().build());
+                    }
+                });
     }
 
     @PostMapping("/createCart")
     public CompletableFuture<ResponseEntity<CartCheckoutDTO>> createCartCheckout(@RequestBody CartCheckoutDTO cartCheckout) {
         return cartCheckoutService.createCartCheckout(cartCheckout)
-                .thenApply(createdCartCheckout -> ResponseEntity.status(HttpStatus.CREATED).body(createdCartCheckout));
+                .thenCompose(createdCartCheckout -> cartCheckoutService.storeCheckedOutBooks(createdCartCheckout)
+                        .thenApply(v -> ResponseEntity.status(HttpStatus.CREATED).body(createdCartCheckout)));
     }
 
     @GetMapping("/list")
@@ -57,5 +64,11 @@ public class CartCheckoutController {
         return cartCheckoutService.deleteCartCheckout(cartId)
                 .thenApply(deleted ->
                         deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/inventory")
+    public CompletableFuture<ResponseEntity<Void>> storeCheckedOutBooks(@RequestBody CartCheckoutDTO cartCheckoutDTO) {
+        return cartCheckoutService.storeCheckedOutBooks(cartCheckoutDTO)
+                .thenApply(v -> ResponseEntity.status(HttpStatus.CREATED).build());
     }
 }

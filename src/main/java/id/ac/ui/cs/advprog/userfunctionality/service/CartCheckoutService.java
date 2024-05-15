@@ -11,4 +11,5 @@ public interface CartCheckoutService {
     CompletableFuture<CartCheckoutDTO> findCartCheckoutById(Long cartId);
     CompletableFuture<CartCheckoutDTO> updateCartCheckout(Long cartId, CartCheckoutDTO cartCheckoutDTO);
     CompletableFuture<Boolean> deleteCartCheckout(Long cartId);
+    CompletableFuture<Void> storeCheckedOutBooks(CartCheckoutDTO cartCheckoutDTO);
 }
