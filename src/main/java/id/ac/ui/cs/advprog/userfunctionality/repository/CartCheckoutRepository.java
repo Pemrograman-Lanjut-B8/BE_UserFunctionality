@@ -1,7 +1,6 @@
 package id.ac.ui.cs.advprog.userfunctionality.repository;
 
 import id.ac.ui.cs.advprog.userfunctionality.model.CartCheckout;
-import id.ac.ui.cs.advprog.userfunctionality.model.CartItems;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -14,43 +13,46 @@ public class CartCheckoutRepository {
     private List<CartCheckout> cartCheckoutData = new ArrayList<>();
 
     public CartCheckout create(CartCheckout cartCheckout) {
+        if (cartCheckout == null) {
+            throw new IllegalArgumentException("CartCheckout cannot be null");
+        }
         cartCheckoutData.add(cartCheckout);
         return cartCheckout;
     }
 
     public List<CartCheckout> findAll() {
-        return cartCheckoutData;
+        return new ArrayList<>(cartCheckoutData);
     }
 
     public Optional<CartCheckout> findById(Long cartId) {
+        if (cartId == null) {
+            throw new IllegalArgumentException("Cart ID cannot be null");
+        }
         return cartCheckoutData.stream()
                 .filter(cart -> cart.getCartId().equals(cartId))
                 .findFirst();
     }
 
     public CartCheckout update(Long cartId, CartCheckout updatedCartCheckout) {
-        for (int i = 0; i < cartCheckoutData.size(); i++) {
-            CartCheckout cartCheckout = cartCheckoutData.get(i);
-            if (cartCheckout.getCartId().equals(cartId)) {
-                // Update cart details
-                cartCheckout.setUserId(updatedCartCheckout.getUserId());
-                cartCheckout.setItems(updatedCartCheckout.getItems());
-                cartCheckout.setTotalPrice(updatedCartCheckout.getTotalPrice());
-                return cartCheckout;
-            }
+        if (cartId == null || updatedCartCheckout == null) {
+            throw new IllegalArgumentException("Cart ID and CartCheckout cannot be null");
         }
-        return null;
+        return cartCheckoutData.stream()
+                .filter(cart -> cart.getCartId().equals(cartId))
+                .findFirst()
+                .map(cart -> {
+                    cart.setUserId(updatedCartCheckout.getUserId());
+                    cart.setItems(updatedCartCheckout.getItems());
+                    cart.setTotalPrice(updatedCartCheckout.getTotalPrice());
+                    return cart;
+                })
+                .orElseThrow(() -> new IllegalArgumentException("CartCheckout not found with id: " + cartId));
     }
 
     public boolean delete(Long cartId) {
-        Iterator<CartCheckout> iterator = cartCheckoutData.iterator();
-        while (iterator.hasNext()) {
-            CartCheckout cartCheckout = iterator.next();
-            if (cartCheckout.getCartId().equals(cartId)) {
-                iterator.remove();
-                return true;
-            }
+        if (cartId == null) {
+            throw new IllegalArgumentException("Cart ID cannot be null");
         }
-        return false;
+        return cartCheckoutData.removeIf(cart -> cart.getCartId().equals(cartId));
     }
 }

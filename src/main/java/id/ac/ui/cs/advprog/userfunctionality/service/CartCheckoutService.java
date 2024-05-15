@@ -1,15 +1,15 @@
 package id.ac.ui.cs.advprog.userfunctionality.service;
 
-import id.ac.ui.cs.advprog.userfunctionality.model.CartCheckout;
-import id.ac.ui.cs.advprog.userfunctionality.model.CartItems;
+import id.ac.ui.cs.advprog.userfunctionality.dto.CartCheckoutDTO;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public interface CartCheckoutService {
-    CartCheckout create(CartCheckout cartCheckout);
-    List<CartCheckout> findAll();
-    Optional<CartCheckout> findById(Long cartId);
-    CartCheckout update(Long cartId, CartCheckout updatedCartCheckout);
-    boolean delete(Long cartId);
+    CompletableFuture<CartCheckoutDTO> createCartCheckout(CartCheckoutDTO cartCheckoutDTO);
+    CompletableFuture<List<CartCheckoutDTO>> findAll();
+    CompletableFuture<CartCheckoutDTO> findCartCheckoutById(Long cartId);
+    CompletableFuture<CartCheckoutDTO> updateCartCheckout(Long cartId, CartCheckoutDTO cartCheckoutDTO);
+    CompletableFuture<Boolean> deleteCartCheckout(Long cartId);
+    CompletableFuture<Void> storeCheckedOutBooks(CartCheckoutDTO cartCheckoutDTO);
 }
