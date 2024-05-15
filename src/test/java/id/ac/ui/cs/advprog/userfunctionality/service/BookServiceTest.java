@@ -30,9 +30,9 @@ public class BookServiceTest {
     public void testGetAllBooks() {
         // Prepare dummy data
         List<Book> expectedBooks = new ArrayList<>();
-        expectedBooks.add(new Book(1L, "Book A", "Author A", "Description for Book A"));
-        expectedBooks.add(new Book(2L, "Book B", "Author B", "Description for Book B"));
-        expectedBooks.add(new Book(3L, "Book C", "Author C", "Description for Book C"));
+        expectedBooks.add(new Book(1L, "Book A", "Author A", "Description for Book A",4.5));
+        expectedBooks.add(new Book(2L, "Book B", "Author B", "Description for Book B",4.6));
+        expectedBooks.add(new Book(3L, "Book C", "Author C", "Description for Book C",4.8));
 
         // Mock the behavior of the BookRepository
         when(bookRepository.getAllBooks()).thenReturn(expectedBooks);

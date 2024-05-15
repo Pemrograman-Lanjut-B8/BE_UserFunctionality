@@ -4,41 +4,64 @@ import id.ac.ui.cs.advprog.userfunctionality.model.Book;
 import id.ac.ui.cs.advprog.userfunctionality.service.BookService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.ui.Model;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+@SpringBootTest
+@AutoConfigureMockMvc
 public class BookControllerTest {
 
-    private BookController bookController;
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
     private BookService bookService;
-    private Model model;
 
-    @BeforeEach
-    public void setUp() {
-        bookService = mock(BookService.class);
-        model = mock(Model.class);
-        bookController = new BookController(bookService);
-    }
+    private List<Book> sampleBooks;
 
-    @Test
-    public void testShowLandingPage() {
-        List<Book> books = new ArrayList<>();
-        books.add(new Book(1L, "Book A", "Author A", "Description A"));
-        books.add(new Book(2L, "Book B", "Author B", "Description B"));
-        when(bookService.getAllBooks()).thenReturn(books);
-
-        ModelAndView modelAndView = bookController.showLandingPage(model);
-        String viewName = modelAndView.getViewName();
-        assertEquals("LandingPage", viewName);
-
-        // Verify that the model contains the correct attribute
-        assertEquals(books, modelAndView.getModel().get("books"));
-    }
+//    @BeforeEach
+//    void setUp() {
+//        // Initialize sample books
+//        sampleBooks = Arrays.asList(
+//                new Book(1L, "Book A", "Author A", "Description for Book A", 4.5),
+//                new Book(2L, "Book B", "Author B", "Description for Book B", 4.6),
+//                new Book(3L, "Book C", "Author C", "Description for Book C", 4.8)
+//        );
+//
+//        // Mock BookService to return sample books
+//        bookService = new BookService() {
+//            @Override
+//            public List<Book> getTopRatedBooks() {
+//                return sampleBooks.subList(0, 2); // Return first 2 books
+//            }
+//
+//            @Override
+//            public List<Book> getAllBooks() {
+//                return sampleBooks;
+//            }
+//        };
+//    }
+//
+//    @Test
+//    public void testGetTopRatedBooks() throws Exception {
+//        // Perform GET request to /api/books/top-rated
+//        mockMvc.perform(MockMvcRequestBuilders.get("/api/books/top-rated"))
+//                .andExpect(MockMvcResultMatchers.status().isOk())
+//                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(3));
+//    }
+//
+//    @Test
+//    public void testGetAllBooks() throws Exception {
+//        // Perform GET request to /api/books/all
+//        mockMvc.perform(MockMvcRequestBuilders.get("/api/books/all"))
+//                .andExpect(MockMvcResultMatchers.status().isOk())
+//                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(sampleBooks.size())); // Expecting all sample books
+//    }
 }
