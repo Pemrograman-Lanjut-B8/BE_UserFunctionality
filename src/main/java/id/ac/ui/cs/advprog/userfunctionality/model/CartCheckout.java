@@ -1,21 +1,29 @@
 package id.ac.ui.cs.advprog.userfunctionality.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.Data;
 
 import java.util.List;
-import java.util.ArrayList;
-import java.util.UUID;
 
-@Getter @Setter
+@Entity
+@Data
+@Table(name = "cart_checkout")
+
 public class CartCheckout {
-    private Long cartId;
-    private String userId;
+
+    @Id
+    @Column
+    private long id;
+
+    @ManyToOne
+    private UserEntity user;
+
+    @OneToMany
     private List<CartItems> items;
+
+    @Column
     private double totalPrice;
 
-    public CartCheckout() {
-        this.userId = UUID.randomUUID().toString();
-        this.items = new ArrayList<>();
-    }
+    @Column
+    private String status;
 }
