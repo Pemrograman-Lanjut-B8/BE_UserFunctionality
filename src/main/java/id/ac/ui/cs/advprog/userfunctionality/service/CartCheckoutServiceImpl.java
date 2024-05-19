@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -77,11 +78,12 @@ public class CartCheckoutServiceImpl implements CartCheckoutService {
         });
     }
 
-    // Helper method to convert DTO to entity
     private CartCheckout toCartCheckoutEntity(CartCheckoutDTO dto) {
         CartCheckout cartCheckout = new CartCheckout();
         cartCheckout.setId(dto.getId());
-        cartCheckout.setUser(new UserEntity(dto.getUserId(), null, null));
+        UserEntity user = new UserEntity();
+        user.setId(UUID.fromString(dto.getUserId()));
+        cartCheckout.setUser(user);
         cartCheckout.setItems(dto.getItems().stream()
                 .map(this::toCartItemsEntity)
                 .collect(Collectors.toList()));
@@ -90,11 +92,11 @@ public class CartCheckoutServiceImpl implements CartCheckoutService {
         return cartCheckout;
     }
 
-    // Helper method to convert entity to DTO
     private CartCheckoutDTO toCartCheckoutDTO(CartCheckout cartCheckout) {
         CartCheckoutDTO dto = new CartCheckoutDTO();
         dto.setId(cartCheckout.getId());
-        dto.setUserId(cartCheckout.getUser().getId().toString());
+        UUID userId = cartCheckout.getUser().getId();
+        dto.setUserId(userId != null ? userId.toString() : null);
         dto.setItems(cartCheckout.getItems().stream()
                 .map(this::toCartItemsDTO)
                 .collect(Collectors.toList()));
@@ -103,7 +105,6 @@ public class CartCheckoutServiceImpl implements CartCheckoutService {
         return dto;
     }
 
-    // Helper method to convert CartItemsDTO to CartItems entity
     private CartItems toCartItemsEntity(CartItemsDTO dto) {
         CartItems cartItems = new CartItems();
         cartItems.setId(dto.getCartId());
@@ -114,7 +115,6 @@ public class CartCheckoutServiceImpl implements CartCheckoutService {
         return cartItems;
     }
 
-    // Helper method to convert CartItems entity to CartItemsDTO
     private CartItemsDTO toCartItemsDTO(CartItems cartItems) {
         CartItemsDTO dto = new CartItemsDTO();
         dto.setCartId(cartItems.getId());
