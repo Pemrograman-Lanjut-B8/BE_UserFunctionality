@@ -1,11 +1,8 @@
 package id.ac.ui.cs.advprog.userfunctionality.model;
 
+import jakarta.persistence.*;
 import lombok.Data;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -21,8 +18,8 @@ public class ReviewRating {
     @Column(name = "username")
     private String username;
 
-    @Column(name = "book_id")
-    private String bookId;
+    @ManyToOne
+    private Book book;
 
     @Column(name = "review")
     private String review;
@@ -36,10 +33,9 @@ public class ReviewRating {
     public ReviewRating() {
     }
 
-    public ReviewRating(String username, String bookId, String review, int rating) {
+    public ReviewRating(String username, String review, int rating) {
         this.reviewId = UUID.randomUUID().toString();
         this.username = username;
-        this.bookId = bookId;
         this.review = review;
         setReview(review);
         this.rating = rating;
