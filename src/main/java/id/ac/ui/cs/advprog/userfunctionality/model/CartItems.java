@@ -2,7 +2,9 @@ package id.ac.ui.cs.advprog.userfunctionality.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Setter;
 
+@Setter
 @Entity
 @Data
 @Table(name = "cart_items")
@@ -21,4 +23,8 @@ public class CartItems {
 
     @ManyToOne
     private UserEntity user;
+
+    public CartItems() {
+
+    }
 }

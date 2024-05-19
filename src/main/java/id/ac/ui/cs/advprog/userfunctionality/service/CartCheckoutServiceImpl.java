@@ -1,5 +1,7 @@
 package id.ac.ui.cs.advprog.userfunctionality.service;
 
+import id.ac.ui.cs.advprog.userfunctionality.builder.CartCheckoutBuilder;
+import id.ac.ui.cs.advprog.userfunctionality.builder.CartItemsBuilder;
 import id.ac.ui.cs.advprog.userfunctionality.dto.CartCheckoutDTO;
 import id.ac.ui.cs.advprog.userfunctionality.dto.CartItemsDTO;
 import id.ac.ui.cs.advprog.userfunctionality.model.CartCheckout;
@@ -26,38 +28,38 @@ public class CartCheckoutServiceImpl implements CartCheckoutService {
     @Async
     public CompletableFuture<CartCheckoutDTO> createCartCheckout(CartCheckoutDTO cartCheckoutDTO) {
         return CompletableFuture.supplyAsync(() -> {
-            CartCheckout cartCheckout = toCartCheckoutEntity(cartCheckoutDTO);
-            CartCheckout savedCheckout = cartCheckoutRepository.create(cartCheckout);
-            return toCartCheckoutDTO(savedCheckout);
-        });
-    }
-
-    @Override
-    @Async
-    public CompletableFuture<List<CartCheckoutDTO>> findAll() {
-        return CompletableFuture.supplyAsync(() -> cartCheckoutRepository.findAll().stream()
-                .map(this::toCartCheckoutDTO)
-                .collect(Collectors.toList()));
-    }
-
-    @Override
-    @Async
-    public CompletableFuture<CartCheckoutDTO> findCartCheckoutById(Long cartId) {
-        return CompletableFuture.supplyAsync(() -> {
-            CartCheckout cartCheckout = cartCheckoutRepository.findById(cartId)
-                    .orElseThrow(() -> new IllegalArgumentException("Cart not found with id: " + cartId));
+            UserEntity user = getUserEntity(cartCheckoutDTO.getUserId());
+            List<CartItems> items = cartCheckoutDTO.getItems().stream()
+                    .map(dto -> toCartItemsEntity(dto, user))
+                    .collect(Collectors.toList());
+            CartCheckout cartCheckout = cartCheckoutRepository.create(cartCheckoutDTO, user, items);
             return toCartCheckoutDTO(cartCheckout);
         });
     }
 
     @Override
     @Async
+    public CompletableFuture<List<CartCheckoutDTO>> findAll() {
+        return CompletableFuture.supplyAsync(cartCheckoutRepository::findAll);
+    }
+
+    @Override
+    @Async
+    public CompletableFuture<CartCheckoutDTO> findCartCheckoutById(Long cartId) {
+        return CompletableFuture.supplyAsync(() -> cartCheckoutRepository.findById(cartId)
+                .orElseThrow(() -> new IllegalArgumentException("Cart not found with id: " + cartId)));
+    }
+
+    @Override
+    @Async
     public CompletableFuture<CartCheckoutDTO> updateCartCheckout(Long cartId, CartCheckoutDTO cartCheckoutDTO) {
         return CompletableFuture.supplyAsync(() -> {
-            CartCheckout cartCheckout = toCartCheckoutEntity(cartCheckoutDTO);
-            cartCheckout.setId(cartId);
-            CartCheckout updatedCheckout = cartCheckoutRepository.update(cartId, cartCheckout);
-            return toCartCheckoutDTO(updatedCheckout);
+            UserEntity user = getUserEntity(cartCheckoutDTO.getUserId());
+            List<CartItems> items = cartCheckoutDTO.getItems().stream()
+                    .map(dto -> toCartItemsEntity(dto, user))
+                    .collect(Collectors.toList());
+            CartCheckout updatedCartCheckout = cartCheckoutRepository.update(cartId, cartCheckoutDTO, user, items);
+            return toCartCheckoutDTO(updatedCartCheckout);
         });
     }
 
@@ -71,25 +73,21 @@ public class CartCheckoutServiceImpl implements CartCheckoutService {
     @Async
     public CompletableFuture<Void> storeCheckedOutBooks(CartCheckoutDTO cartCheckoutDTO) {
         return CompletableFuture.runAsync(() -> {
-            cartCheckoutDTO.getItems().forEach(item -> {
-                System.out.println("Judul Buku: " + item.getBookTitle());
-                System.out.println("Jumlah: " + item.getQuantity());
-            });
+            UserEntity user = getUserEntity(cartCheckoutDTO.getUserId());
+            List<CartItems> items = cartCheckoutDTO.getItems().stream()
+                    .map(dto -> toCartItemsEntity(dto, user))
+                    .collect(Collectors.toList());
+            CartCheckout cartCheckout = new CartCheckoutBuilder()
+                    .fromDTO(cartCheckoutDTO, user, items)
+                    .build();
+            cartCheckoutRepository.create(cartCheckoutDTO, user, items);
         });
     }
 
-    private CartCheckout toCartCheckoutEntity(CartCheckoutDTO dto) {
-        CartCheckout cartCheckout = new CartCheckout();
-        cartCheckout.setId(dto.getId());
+    private UserEntity getUserEntity(String userId) {
         UserEntity user = new UserEntity();
-        user.setId(UUID.fromString(dto.getUserId()));
-        cartCheckout.setUser(user);
-        cartCheckout.setItems(dto.getItems().stream()
-                .map(this::toCartItemsEntity)
-                .collect(Collectors.toList()));
-        cartCheckout.setTotalPrice(dto.getTotalPrice());
-        cartCheckout.setStatus(dto.getStatus());
-        return cartCheckout;
+        user.setId(UUID.fromString(userId));
+        return user;
     }
 
     private CartCheckoutDTO toCartCheckoutDTO(CartCheckout cartCheckout) {
@@ -105,14 +103,18 @@ public class CartCheckoutServiceImpl implements CartCheckoutService {
         return dto;
     }
 
-    private CartItems toCartItemsEntity(CartItemsDTO dto) {
-        CartItems cartItems = new CartItems();
-        cartItems.setId(dto.getCartId());
+    private CartItems toCartItemsEntity(CartItemsDTO dto, UserEntity user) {
+        Book book = getBookByIsbn(dto.getBookIsbn());
+        return new CartItemsBuilder()
+                .fromDTO(dto, book, user)
+                .build();
+    }
+
+    private Book getBookByIsbn(String isbn) {
         Book book = new Book();
-        book.setIsbn(dto.getBookIsbn());
-        cartItems.setBook(book);
-        cartItems.setQuantity(dto.getQuantity());
-        return cartItems;
+        book.setIsbn(isbn);
+
+        return book;
     }
 
     private CartItemsDTO toCartItemsDTO(CartItems cartItems) {
