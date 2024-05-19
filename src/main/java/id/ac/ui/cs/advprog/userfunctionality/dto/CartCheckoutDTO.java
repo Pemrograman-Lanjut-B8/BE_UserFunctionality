@@ -8,8 +8,9 @@ import java.util.List;
 
 @Getter @Setter
 public class CartCheckoutDTO {
-    private Long cartId;
+    private Long id;
     private String userId;
     private List<CartItemsDTO> items = new ArrayList<>();
     private double totalPrice;
+    private String status;
 }
