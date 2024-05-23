@@ -51,4 +51,13 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
         Command deleteCommand = new DeleteReviewRatingCommand(reviewId, reviewRatingRepository);
         deleteCommand.execute();
     }
+
+    @Override
+    public double getAverageRatingByIsbn(String isbn) {
+        List<ReviewRating> reviews = reviewRatingRepository.findByBookIsbn(isbn);
+        return reviews.stream()
+                .mapToInt(ReviewRating::getRating)
+                .average()
+                .orElse(0.0);
+    }
 }

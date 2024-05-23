@@ -11,4 +11,5 @@ public interface ReviewRatingService {
     Optional<ReviewRating> findById(String reviewId);
     ReviewRating updateReviewRating(String reviewId, ReviewRating updatedReviewRating);
     void deleteReviewRating(String reviewId);
+    double getAverageRatingByIsbn(String isbn);
 }

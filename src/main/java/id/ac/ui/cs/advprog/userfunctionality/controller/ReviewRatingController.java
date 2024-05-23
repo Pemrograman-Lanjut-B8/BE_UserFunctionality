@@ -56,4 +56,15 @@ public class ReviewRatingController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @GetMapping("/average-rating/{isbn}")
+    public ResponseEntity<Object> getAverageRatingByIsbn(@PathVariable("isbn") String isbn) {
+        try {
+            double averageRating = reviewRatingService.getAverageRatingByIsbn(isbn);
+            return ResponseEntity.ok(averageRating);
+        } catch (Exception ex) {
+            System.out.println("Error in get average rating: " + ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error getting average rating");
+        }
+    }
 }
