@@ -35,14 +35,14 @@ class ReviewRatingServiceImplTest {
         reviewRating1 = new ReviewRating();
         reviewRating1.setReviewId("1");
         reviewRating1.setUsername("novrizair1");
-        reviewRating1.setBook("book1");
+//        reviewRating1.setBook("book1");
         reviewRating1.setReview("Good book");
         reviewRating1.setRating(4);
 
         reviewRating2 = new ReviewRating();
         reviewRating2.setReviewId("2");
         reviewRating2.setUsername("novrizair2");
-        reviewRating2.setBook("book2");
+//        reviewRating2.setBook("book2");
         reviewRating2.setReview("Excellent book");
         reviewRating2.setRating(5);
     }
