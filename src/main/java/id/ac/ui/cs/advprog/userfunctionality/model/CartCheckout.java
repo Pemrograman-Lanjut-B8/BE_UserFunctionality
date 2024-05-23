@@ -2,13 +2,14 @@ package id.ac.ui.cs.advprog.userfunctionality.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Setter;
 
 import java.util.List;
 
+@Setter
 @Entity
 @Data
 @Table(name = "cart_checkout")
-
 public class CartCheckout {
 
     @Id
@@ -26,4 +27,8 @@ public class CartCheckout {
 
     @Column
     private String status;
+
+    public CartCheckout() {
+
+    }
 }

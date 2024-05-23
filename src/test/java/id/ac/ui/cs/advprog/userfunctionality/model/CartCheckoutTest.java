@@ -3,7 +3,10 @@ package id.ac.ui.cs.advprog.userfunctionality.model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CartCheckoutTest {
@@ -12,37 +15,59 @@ public class CartCheckoutTest {
     @BeforeEach
     void setUp() {
         this.cartCheckout = new CartCheckout();
-        // Testing with a UUID to mimic real scenario
-        this.cartCheckout.setUserId(UUID.randomUUID().toString());
-        this.cartCheckout.setCartId(1L);
 
-        // Adding items for testing
-        CartItems item1 = new CartItems(1L, "Title 1", 50.0, 2);
-        this.cartCheckout.getItems().add(item1);
-        this.cartCheckout.setTotalPrice(50.0 * 2);  // Simulating setting total price when adding items
+        UserEntity user = new UserEntity();
+        user.setId(UUID.randomUUID());
+        this.cartCheckout.setUser(user);
 
-        CartItems item2 = new CartItems(2L, "Title 2", 1000.0, 1);
-        this.cartCheckout.getItems().add(item2);
-        this.cartCheckout.setTotalPrice(this.cartCheckout.getTotalPrice() + 1000.0);  // Update total price manually
+        List<CartItems> items = new ArrayList<>();
+        CartItems item1 = new CartItems();
+        item1.setId(1L);
+        item1.setQuantity(2);
+
+        Book book1 = new Book();
+        book1.setJudulBuku("Title 1");
+        book1.setHarga(50.0);
+        item1.setBook(book1);
+        items.add(item1);
+
+        CartItems item2 = new CartItems();
+        item2.setId(2L);
+        item2.setQuantity(1);
+
+        Book book2 = new Book();
+        book2.setJudulBuku("Title 2");
+        book2.setHarga(1000.0);
+        item2.setBook(book2);
+        items.add(item2);
+
+        this.cartCheckout.setItems(items);
+        this.cartCheckout.setTotalPrice(50.0 * 2 + 1000.0);
+        this.cartCheckout.setStatus("Pending");
     }
 
     @Test
-    void testGetCartId() {
-        assertEquals(1L, this.cartCheckout.getCartId());
+    void testGetId() {
+        assertEquals(0L, this.cartCheckout.getId());
     }
 
     @Test
-    void testGetUserId() {
-        assertNotNull(this.cartCheckout.getUserId());  // Just check it's not null, because it's a UUID
+    void testGetUser() {
+        assertNotNull(this.cartCheckout.getUser());
     }
 
     @Test
     void testGetTotalPrice() {
-        assertEquals(1100.0, this.cartCheckout.getTotalPrice());  // Reflects adding both items
+        assertEquals(1100.0, this.cartCheckout.getTotalPrice());
     }
 
     @Test
     void testGetItems() {
         assertEquals(2, this.cartCheckout.getItems().size());
+    }
+
+    @Test
+    void testGetStatus() {
+        assertEquals("Pending", this.cartCheckout.getStatus());
     }
 }

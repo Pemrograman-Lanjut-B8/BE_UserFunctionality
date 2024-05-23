@@ -2,12 +2,6 @@ package id.ac.ui.cs.advprog.userfunctionality.controller;
 
 import id.ac.ui.cs.advprog.userfunctionality.dto.CartCheckoutDTO;
 import id.ac.ui.cs.advprog.userfunctionality.service.CartCheckoutService;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
-import static org.mockito.Mockito.*;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,6 +12,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 public class CartCheckoutControllerTest {
 
@@ -37,13 +38,18 @@ public class CartCheckoutControllerTest {
     @Test
     public void testGetCartCheckout() throws Exception {
         CartCheckoutDTO cartCheckoutDTO = new CartCheckoutDTO();
-        cartCheckoutDTO.setCartId(1L);
+        cartCheckoutDTO.setId(1L);
+        cartCheckoutDTO.setUserId("user123");
+        cartCheckoutDTO.setTotalPrice(100.0);
+
         when(cartCheckoutService.findCartCheckoutById(1L))
                 .thenReturn(CompletableFuture.completedFuture(cartCheckoutDTO));
 
         mockMvc.perform(get("/cart/checkout/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.cartId").value(1L));
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.userId").value("user123"))
+                .andExpect(jsonPath("$.totalPrice").value(100.0));
     }
 
     @Test
@@ -58,41 +64,51 @@ public class CartCheckoutControllerTest {
     @Test
     public void testCreateCartCheckout() throws Exception {
         CartCheckoutDTO cartCheckoutDTO = new CartCheckoutDTO();
-        cartCheckoutDTO.setCartId(1L);
+        cartCheckoutDTO.setId(1L);
+        cartCheckoutDTO.setUserId("user123");
+
         when(cartCheckoutService.createCartCheckout(any(CartCheckoutDTO.class)))
                 .thenReturn(CompletableFuture.completedFuture(cartCheckoutDTO));
 
         mockMvc.perform(post("/cart/createCart")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"cartId\":1, \"userId\":\"user123\"}"))
+                        .content("{\"id\":1, \"userId\":\"user123\"}"))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.cartId").value(1L));
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.userId").value("user123"));
     }
 
     @Test
     public void testCartCheckoutList() throws Exception {
         List<CartCheckoutDTO> allCartCheckouts = new ArrayList<>();
-        allCartCheckouts.add(new CartCheckoutDTO());
+        CartCheckoutDTO cartCheckoutDTO = new CartCheckoutDTO();
+        cartCheckoutDTO.setId(1L);
+        allCartCheckouts.add(cartCheckoutDTO);
+
         when(cartCheckoutService.findAll())
                 .thenReturn(CompletableFuture.completedFuture(allCartCheckouts));
 
         mockMvc.perform(get("/cart/list"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value(1L));
     }
 
     @Test
     public void testEditCartCheckout() throws Exception {
         CartCheckoutDTO cartCheckoutDTO = new CartCheckoutDTO();
-        cartCheckoutDTO.setCartId(1L);
+        cartCheckoutDTO.setId(1L);
+        cartCheckoutDTO.setUserId("updatedUser");
+
         when(cartCheckoutService.updateCartCheckout(eq(1L), any(CartCheckoutDTO.class)))
                 .thenReturn(CompletableFuture.completedFuture(cartCheckoutDTO));
 
         mockMvc.perform(put("/cart/edit/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"cartId\":1, \"userId\":\"updatedUser\"}"))
+                        .content("{\"id\":1, \"userId\":\"updatedUser\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.cartId").value(1L));
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.userId").value("updatedUser"));
     }
 
     @Test
@@ -102,7 +118,7 @@ public class CartCheckoutControllerTest {
 
         mockMvc.perform(put("/cart/edit/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"cartId\":1, \"userId\":\"updatedUser\"}"))
+                        .content("{\"id\":1, \"userId\":\"updatedUser\"}"))
                 .andExpect(status().isNotFound());
     }
 
