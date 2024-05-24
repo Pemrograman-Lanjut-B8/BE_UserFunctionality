@@ -1,90 +1,40 @@
 package id.ac.ui.cs.advprog.userfunctionality.repository;
 
+import id.ac.ui.cs.advprog.userfunctionality.model.Book;
 import id.ac.ui.cs.advprog.userfunctionality.model.ReviewRating;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@ExtendWith(MockitoExtension.class)
-class ReviewRatingRepositoryTest {
+@DataJpaTest
+public class ReviewRatingRepositoryTest {
 
-    @Mock
-    ReviewRatingRepository reviewRatingRepository;
-
-    List<ReviewRating> reviewRatings;
-
-    @BeforeEach
-    void setUp() {
-        reviewRatings = new ArrayList<>();
-
-        ReviewRating reviewRating1 = new ReviewRating();
-        reviewRating1.setReviewId("1");
-        reviewRating1.setUsername("novrizair1");
-        reviewRating1.setBookId("book1");
-        reviewRating1.setReview("Good book");
-        reviewRating1.setRating(4);
-        reviewRatings.add(reviewRating1);
-
-        ReviewRating reviewRating2 = new ReviewRating();
-        reviewRating2.setReviewId("2");
-        reviewRating2.setUsername("novrizair2");
-        reviewRating2.setBookId("book2");
-        reviewRating2.setReview("Excellent book");
-        reviewRating2.setRating(5);
-        reviewRatings.add(reviewRating2);
-    }
+    @Autowired
+    private ReviewRatingRepository reviewRatingRepository;
 
     @Test
-    void testCreate() {
-        ReviewRating reviewRating = reviewRatings.getFirst();
-        Mockito.when(reviewRatingRepository.save(reviewRating)).thenReturn(reviewRating);
+    public void testFindByBookIsbn() {
+        Book book = new Book();
+        book.setIsbn("1234567890");
 
-        ReviewRating savedReviewRating = reviewRatingRepository.save(reviewRating);
+        ReviewRating review1 = new ReviewRating("user1", "Great book!", 9);
+        review1.setBook(book);
+        ReviewRating review2 = new ReviewRating("user2", "Not bad", 7);
+        review2.setBook(book);
 
-        assertEquals(reviewRating, savedReviewRating);
-    }
+        reviewRatingRepository.save(review1);
+        reviewRatingRepository.save(review2);
 
-//    @Test
-//    void testFindAll() {
-//        Mockito.when(reviewRatingRepository.findAll()).thenReturn((Iterable<ReviewRating>) reviewRatings.iterator());
-//
-//        Iterator<ReviewRating> reviewRatingIterator = reviewRatingRepository.findAll().iterator();
-//
-//        List<ReviewRating> retrievedReviewRatings = new ArrayList<>();
-//        reviewRatingIterator.forEachRemaining(retrievedReviewRatings::add);
-//
-//        assertEquals(reviewRatings.size(), retrievedReviewRatings.size());
-//        assertTrue(retrievedReviewRatings.containsAll(reviewRatings));
-//    }
-//
-//    @Test
-//    void testFindById() {
-//        ReviewRating reviewRating = reviewRatings.getFirst();
-//        Mockito.when(reviewRatingRepository.findById(reviewRating.getReviewId())).thenReturn(Optional.of(reviewRating));
-//
-//        Optional<ReviewRating> retrievedReviewRating = reviewRatingRepository.findById(reviewRating.getReviewId());
-//
-//        assertTrue(retrievedReviewRating.isPresent());
-//        assertEquals(reviewRating, retrievedReviewRating.get());
-//    }
+        List<ReviewRating> reviews = reviewRatingRepository.findByBookIsbn("1234567890");
 
-    @Test
-    void testDelete() {
-        ReviewRating reviewRating = reviewRatings.getFirst();
-        Mockito.doNothing().when(reviewRatingRepository).deleteById(reviewRating.getReviewId());
-
-        reviewRatingRepository.deleteById(reviewRating.getReviewId());
-
-        Mockito.verify(reviewRatingRepository, Mockito.times(1)).deleteById(reviewRating.getReviewId());
+        assertNotNull(reviews);
+        assertEquals(2, reviews.size());
+        assertEquals("user1", reviews.get(0).getUsername());
+        assertEquals("user2", reviews.get(1).getUsername());
     }
 }
