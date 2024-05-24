@@ -19,6 +19,7 @@ public class CartCheckoutRepository {
     private List<CartCheckout> cartCheckoutData = new ArrayList<>();
     private AtomicLong idGenerator = new AtomicLong();
 
+//    blum disambung ke database
     public CartCheckout create(CartCheckoutDTO cartCheckoutDTO, UserEntity user, List<CartItems> items) {
         if (cartCheckoutDTO == null) {
             throw new IllegalArgumentException("CartCheckoutDTO cannot be null");
