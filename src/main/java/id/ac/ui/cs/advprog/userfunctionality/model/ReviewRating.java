@@ -31,16 +31,19 @@ public class ReviewRating {
     private LocalDateTime dateTime;
 
     public ReviewRating() {
+        this.reviewId = UUID.randomUUID().toString();
+        this.dateTime = LocalDateTime.now();
     }
 
     public ReviewRating(String username, String review, int rating) {
-        this.reviewId = UUID.randomUUID().toString();
+        this();
         this.username = username;
-        this.review = review;
         setReview(review);
-        this.rating = rating;
         setRating(rating);
-        this.dateTime = LocalDateTime.now();
+    }
+
+    public void setReviewId(String reviewId) {
+        this.reviewId = reviewId;
     }
 
     public void setReview(String review) {
@@ -61,7 +64,7 @@ public class ReviewRating {
         }
     }
 
-    public String getReviewId(){
+    public String getReviewId() {
         return reviewId;
     }
 }

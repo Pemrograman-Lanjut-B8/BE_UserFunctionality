@@ -7,6 +7,7 @@ public interface BookService {
 //    List<Book> getAllBooks();
 //    List<Book> getTopRatedBooks();
     List<Book> getBookRecommendation();
+    Book findByIsbn(String isbn);
 
 
 }

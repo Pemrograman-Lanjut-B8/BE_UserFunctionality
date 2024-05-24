@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, String> {
@@ -25,5 +26,6 @@ public interface BookRepository extends JpaRepository<Book, String> {
 //    List<Book> findAll();
 
     List<Book> findTop5ByOrderByRatingDesc();
+    Optional<Book> findByIsbn(String isbn);
 
 }

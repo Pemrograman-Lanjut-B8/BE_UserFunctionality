@@ -33,13 +33,19 @@ public class ReviewRatingControllerTest {
     @Test
     public void testCreateReviewRating() {
         ReviewRating reviewRating = new ReviewRating("user1", "Great book!", 9);
+        ReviewRatingController.ReviewRatingDTO reviewRatingDTO = new ReviewRatingController.ReviewRatingDTO();
+        reviewRatingDTO.setUsername(reviewRating.getUsername());
+        reviewRatingDTO.setReview(reviewRating.getReview());
+        reviewRatingDTO.setRating(reviewRating.getRating());
+
         when(reviewRatingService.createReviewRating(any(ReviewRating.class))).thenReturn(reviewRating);
 
-        ResponseEntity<Object> response = reviewRatingController.createReviewRating(reviewRating);
+        ResponseEntity<Object> response = reviewRatingController.createReviewRating(reviewRatingDTO);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        verify(reviewRatingService, times(1)).createReviewRating(reviewRating);
+        verify(reviewRatingService, times(1)).createReviewRating(any(ReviewRating.class));
     }
+
 
     @Test
     public void testReviewRatingList() {

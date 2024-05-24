@@ -21,6 +21,9 @@ public class ReviewRatingServiceTest {
     @Mock
     private ReviewRatingRepository reviewRatingRepository;
 
+    @Mock
+    private BookService bookService;
+
     @InjectMocks
     private ReviewRatingServiceImpl reviewRatingService;
 
@@ -32,6 +35,10 @@ public class ReviewRatingServiceTest {
     @Test
     public void testCreateReviewRating() {
         ReviewRating reviewRating = new ReviewRating("user1", "Great book!", 9);
+        Book book = new Book();
+        book.setIsbn("1234567890");
+
+        when(bookService.findByIsbn("1234567890")).thenReturn(book);
         when(reviewRatingRepository.save(any(ReviewRating.class))).thenReturn(reviewRating);
 
         ReviewRating createdReview = reviewRatingService.createReviewRating(reviewRating);
