@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 public class CartCheckoutServiceImplTest {
@@ -35,7 +34,7 @@ public class CartCheckoutServiceImplTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     private CartCheckoutDTO createCartCheckoutDTO() {
@@ -92,7 +91,6 @@ public class CartCheckoutServiceImplTest {
 
     @Test
     public void testCreateCartCheckout() throws Exception {
-
         CartCheckoutDTO cartCheckoutDTO = createCartCheckoutDTO();
         UserEntity user = createUserEntity(cartCheckoutDTO.getUserId());
         List<CartItems> items = createCartItems(cartCheckoutDTO.getItems(), user);
@@ -104,7 +102,7 @@ public class CartCheckoutServiceImplTest {
         cartCheckout.setTotalPrice(cartCheckoutDTO.getTotalPrice());
         cartCheckout.setStatus(cartCheckoutDTO.getStatus());
 
-        when(cartCheckoutRepository.create(any(CartCheckoutDTO.class), any(UserEntity.class), any(List.class)))
+        when(cartCheckoutRepository.save(any(CartCheckout.class)))
                 .thenReturn(cartCheckout);
 
         CompletableFuture<CartCheckoutDTO> future = cartCheckoutService.createCartCheckout(cartCheckoutDTO);
@@ -116,30 +114,11 @@ public class CartCheckoutServiceImplTest {
 
     @Test
     public void testFindAll() {
-
         List<CartCheckout> cartCheckouts = new ArrayList<>();
         CartCheckout cartCheckout = new CartCheckout();
         cartCheckouts.add(cartCheckout);
 
-        when(cartCheckoutRepository.findAll()).thenReturn(cartCheckouts.stream()
-                .map(cart -> {
-                    CartCheckoutDTO dto = new CartCheckoutDTO();
-                    dto.setId(cart.getId());
-                    dto.setUserId(cart.getUser().getId().toString());
-                    dto.setItems(cart.getItems().stream()
-                            .map(item -> {
-                                CartItemsDTO itemDTO = new CartItemsDTO();
-                                itemDTO.setCartId(item.getId());
-                                itemDTO.setBookIsbn(item.getBook().getIsbn());
-                                itemDTO.setBookTitle(item.getBook().getJudulBuku());
-                                itemDTO.setPrice(item.getBook().getHarga());
-                                itemDTO.setQuantity(item.getQuantity());
-                                return itemDTO;
-                            }).collect(Collectors.toList()));
-                    dto.setTotalPrice(cart.getTotalPrice());
-                    dto.setStatus(cart.getStatus());
-                    return dto;
-                }).collect(Collectors.toList()));
+        when(cartCheckoutRepository.findAll()).thenReturn(cartCheckouts);
 
         CompletableFuture<List<CartCheckoutDTO>> future = cartCheckoutService.findAll();
         List<CartCheckoutDTO> cartCheckoutDTOs = future.join();
@@ -161,7 +140,7 @@ public class CartCheckoutServiceImplTest {
         cartCheckout.setTotalPrice(cartCheckoutDTO.getTotalPrice());
         cartCheckout.setStatus(cartCheckoutDTO.getStatus());
 
-        when(cartCheckoutRepository.findById(cartId)).thenReturn(Optional.of(cartCheckoutDTO));
+        when(cartCheckoutRepository.findById(cartId)).thenReturn(Optional.of(cartCheckout));
 
         CompletableFuture<CartCheckoutDTO> future = cartCheckoutService.findCartCheckoutById(cartId);
         CartCheckoutDTO foundCartCheckoutDTO = future.join();
@@ -188,8 +167,8 @@ public class CartCheckoutServiceImplTest {
         updateDTO.setUserId(UUID.randomUUID().toString());
         updateDTO.setTotalPrice(150.0);
 
-        when(cartCheckoutRepository.findById(cartId)).thenReturn(Optional.of(existingCartCheckoutDTO));
-        when(cartCheckoutRepository.update(eq(cartId), any(CartCheckoutDTO.class), any(UserEntity.class), any(List.class)))
+        when(cartCheckoutRepository.findById(cartId)).thenReturn(Optional.of(existingCartCheckout));
+        when(cartCheckoutRepository.save(any(CartCheckout.class)))
                 .thenReturn(existingCartCheckout);
 
         existingCartCheckout.setUser(user);
@@ -207,12 +186,13 @@ public class CartCheckoutServiceImplTest {
     public void testDeleteCartCheckout() throws Exception {
         Long cartId = 1L;
 
-        when(cartCheckoutRepository.delete(cartId)).thenReturn(true);
+        doNothing().when(cartCheckoutRepository).deleteById(cartId);
+        when(cartCheckoutRepository.existsById(cartId)).thenReturn(false);
 
         CompletableFuture<Boolean> future = cartCheckoutService.deleteCartCheckout(cartId);
         boolean isDeleted = future.join();
 
         assertTrue(isDeleted);
-        verify(cartCheckoutRepository).delete(cartId);
+        verify(cartCheckoutRepository).deleteById(cartId);
     }
 }

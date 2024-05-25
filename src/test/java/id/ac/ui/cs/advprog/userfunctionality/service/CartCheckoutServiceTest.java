@@ -35,7 +35,7 @@ public class CartCheckoutServiceTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     private CartCheckoutDTO createCartCheckoutDTO() {
@@ -105,7 +105,7 @@ public class CartCheckoutServiceTest {
         cartCheckout.setTotalPrice(cartCheckoutDTO.getTotalPrice());
         cartCheckout.setStatus(cartCheckoutDTO.getStatus());
 
-        when(cartCheckoutRepository.create(any(CartCheckoutDTO.class), any(UserEntity.class), any(List.class)))
+        when(cartCheckoutRepository.save(any(CartCheckout.class)))
                 .thenReturn(cartCheckout);
 
         CompletableFuture<CartCheckoutDTO> future = cartCheckoutService.createCartCheckout(cartCheckoutDTO);
@@ -129,7 +129,7 @@ public class CartCheckoutServiceTest {
         cartCheckout.setTotalPrice(cartCheckoutDTO.getTotalPrice());
         cartCheckout.setStatus(cartCheckoutDTO.getStatus());
 
-        when(cartCheckoutRepository.findById(cartId)).thenReturn(Optional.of(cartCheckoutDTO));
+        when(cartCheckoutRepository.findById(cartId)).thenReturn(Optional.of(cartCheckout));
 
         CompletableFuture<CartCheckoutDTO> future = cartCheckoutService.findCartCheckoutById(cartId);
         CartCheckoutDTO foundCartCheckoutDTO = future.get();
@@ -156,8 +156,8 @@ public class CartCheckoutServiceTest {
         updateDTO.setUserId(UUID.randomUUID().toString());
         updateDTO.setTotalPrice(150.0);
 
-        when(cartCheckoutRepository.findById(cartId)).thenReturn(Optional.of(existingCartCheckoutDTO));
-        when(cartCheckoutRepository.update(eq(cartId), any(CartCheckoutDTO.class), any(UserEntity.class), any(List.class)))
+        when(cartCheckoutRepository.findById(cartId)).thenReturn(Optional.of(existingCartCheckout));
+        when(cartCheckoutRepository.save(any(CartCheckout.class)))
                 .thenReturn(existingCartCheckout);
 
         existingCartCheckout.setUser(user);
@@ -174,19 +174,21 @@ public class CartCheckoutServiceTest {
     @Test
     public void testDeleteCartCheckout() throws ExecutionException, InterruptedException {
         Long cartId = 1L;
-        when(cartCheckoutRepository.delete(cartId)).thenReturn(true);
+        doNothing().when(cartCheckoutRepository).deleteById(cartId);
+        when(cartCheckoutRepository.existsById(cartId)).thenReturn(false);
 
         CompletableFuture<Boolean> future = cartCheckoutService.deleteCartCheckout(cartId);
         boolean result = future.get();
 
         assertTrue(result);
-        verify(cartCheckoutRepository).delete(cartId);
+        verify(cartCheckoutRepository).deleteById(cartId);
     }
 
     @Test
     public void testDeleteCartCheckoutNotFound() throws ExecutionException, InterruptedException {
         Long cartId = 99L;
-        when(cartCheckoutRepository.delete(cartId)).thenReturn(false);
+        doNothing().when(cartCheckoutRepository).deleteById(cartId);
+        when(cartCheckoutRepository.existsById(cartId)).thenReturn(true);
 
         CompletableFuture<Boolean> future = cartCheckoutService.deleteCartCheckout(cartId);
         boolean result = future.get();
