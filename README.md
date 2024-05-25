@@ -57,3 +57,6 @@ Sebagai contoh, saat pengguna ingin memberikan ulasan, maka ia harus sekaligus m
 Fitur ini dirancang untuk menyajikan ringkasan informasi dan konten yang relevan, seperti penawaran produk terbaru, artikel terkini, atau fitur utama dari aplikasi tersebut. Dalam konteks mikro-layanan, 
 `Landing Page` dapat dipecah menjadi komponen-komponen terpisah yang masing-masing mengelola fungsionalitas tertentu. Misalnya, layanan dapat bertanggung jawab atas pengelolaan konten statis, pembaruan data dinamis, atau interaksi pengguna.
 Dengan pendekatan ini, pengembang dapat mencapai skalabilitas, fleksibilitas, dan pemeliharaan yang lebih baik. Ini memungkinkan aplikasi untuk dengan mudah dikelola, dikembangkan, dan diperbarui seiring waktu, sesuai dengan kebutuhan pengguna dan perubahan pasar.
+
+### 🥇 Profiling
+https://docs.google.com/document/d/1R4JENwT-I_Zd67zH5d932mGh0AgnFktbEZpjAzxciHM/edit?usp=sharing

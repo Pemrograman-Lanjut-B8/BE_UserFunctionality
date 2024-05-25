@@ -1,40 +1,92 @@
 package id.ac.ui.cs.advprog.userfunctionality.model;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ReviewRatingTest {
-    private ReviewRating reviewRating;
 
-    @BeforeEach
-    void setUp() {
-        this.reviewRating = new ReviewRating();
-        this.reviewRating.setReviewId("eb558e9f-1c39-460e-8860-71af6af63bd6");
-        this.reviewRating.setUsername("novrizair");
-        this.reviewRating.setReview("Mantap banget ini buku!");
-        this.reviewRating.setRating(8);
+    @Test
+    public void testDefaultConstructor() {
+        ReviewRating reviewRating = new ReviewRating();
+        assertNotNull(reviewRating.getReviewId());
+        assertNotNull(reviewRating.getDateTime());
     }
 
     @Test
-    void testGetReviewId() {
-        assertEquals("eb558e9f-1c39-460e-8860-71af6af63bd6", this.reviewRating.getReviewId());
+    public void testParameterizedConstructor() {
+        String username = "user1";
+        String review = "Great book!";
+        int rating = 9;
+
+        ReviewRating reviewRating = new ReviewRating(username, review, rating);
+
+        assertEquals(username, reviewRating.getUsername());
+        assertEquals(review, reviewRating.getReview());
+        assertEquals(rating, reviewRating.getRating());
+        assertNotNull(reviewRating.getReviewId());
+        assertNotNull(reviewRating.getDateTime());
     }
 
     @Test
-    void testGetUsername() {
-        assertEquals("novrizair", this.reviewRating.getUsername());
+    public void testSetReviewId() {
+        ReviewRating reviewRating = new ReviewRating();
+        String reviewId = UUID.randomUUID().toString();
+        reviewRating.setReviewId(reviewId);
+        assertEquals(reviewId, reviewRating.getReviewId());
     }
 
     @Test
-    void testGetReview() {
-        assertEquals("Mantap banget ini buku!", this.reviewRating.getReview());
+    public void testSetReviewValid() {
+        ReviewRating reviewRating = new ReviewRating();
+        String review = "Great book!";
+        reviewRating.setReview(review);
+        assertEquals(review, reviewRating.getReview());
     }
 
     @Test
-    void testGetRating() {
-        assertEquals(8, this.reviewRating.getRating());
+    public void testSetReviewInvalid() {
+        ReviewRating reviewRating = new ReviewRating();
+        assertThrows(IllegalArgumentException.class, () -> reviewRating.setReview(""));
     }
 
+    @Test
+    public void testSetRatingValid() {
+        ReviewRating reviewRating = new ReviewRating();
+        reviewRating.setRating(5);
+        assertEquals(5, reviewRating.getRating());
+    }
+
+    @Test
+    public void testSetRatingBelowMinimum() {
+        ReviewRating reviewRating = new ReviewRating();
+        reviewRating.setRating(-1);
+        assertEquals(0, reviewRating.getRating());
+    }
+
+    @Test
+    public void testSetRatingAboveMaximum() {
+        ReviewRating reviewRating = new ReviewRating();
+        reviewRating.setRating(11);
+        assertEquals(10, reviewRating.getRating());
+    }
+
+    @Test
+    public void testSetBook() {
+        ReviewRating reviewRating = new ReviewRating();
+        Book book = new Book();
+        book.setIsbn("1234567890");
+        reviewRating.setBook(book);
+        assertEquals(book, reviewRating.getBook());
+    }
+
+    @Test
+    public void testGetDateTime() {
+        ReviewRating reviewRating = new ReviewRating();
+        LocalDateTime dateTime = reviewRating.getDateTime();
+        assertNotNull(dateTime);
+    }
 }

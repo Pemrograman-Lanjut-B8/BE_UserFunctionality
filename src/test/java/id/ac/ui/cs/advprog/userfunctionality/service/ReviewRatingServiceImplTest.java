@@ -1,25 +1,25 @@
 package id.ac.ui.cs.advprog.userfunctionality.service;
 
+import id.ac.ui.cs.advprog.userfunctionality.model.Book;
 import id.ac.ui.cs.advprog.userfunctionality.model.ReviewRating;
 import id.ac.ui.cs.advprog.userfunctionality.repository.ReviewRatingRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-class ReviewRatingServiceImplTest {
+public class ReviewRatingServiceImplTest {
 
     @Mock
     private ReviewRatingRepository reviewRatingRepository;
@@ -27,72 +27,97 @@ class ReviewRatingServiceImplTest {
     @InjectMocks
     private ReviewRatingServiceImpl reviewRatingService;
 
-    private ReviewRating reviewRating1;
-    private ReviewRating reviewRating2;
-
     @BeforeEach
-    void setUp() {
-        reviewRating1 = new ReviewRating();
-        reviewRating1.setReviewId("1");
-        reviewRating1.setUsername("novrizair1");
-//        reviewRating1.setBook("book1");
-        reviewRating1.setReview("Good book");
-        reviewRating1.setRating(4);
-
-        reviewRating2 = new ReviewRating();
-        reviewRating2.setReviewId("2");
-        reviewRating2.setUsername("novrizair2");
-//        reviewRating2.setBook("book2");
-        reviewRating2.setReview("Excellent book");
-        reviewRating2.setRating(5);
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void testCreateReviewRating() {
-        when(reviewRatingRepository.save(any(ReviewRating.class))).thenReturn(reviewRating1);
-        ReviewRating createdReviewRating = reviewRatingService.createReviewRating(reviewRating1);
-        assertEquals(reviewRating1, createdReviewRating);
-        verify(reviewRatingRepository, times(1)).save(reviewRating1);
+    public void testCreateReviewRating() {
+        ReviewRating reviewRating = new ReviewRating("user1", "Great book!", 9);
+        when(reviewRatingRepository.save(any(ReviewRating.class))).thenReturn(reviewRating);
+
+        ReviewRating createdReview = reviewRatingService.createReviewRating(reviewRating);
+
+        assertNotNull(createdReview);
+        assertEquals("user1", createdReview.getUsername());
+        verify(reviewRatingRepository, times(1)).save(reviewRating);
     }
 
     @Test
-    void testFindAll() {
-        List<ReviewRating> reviewRatings = new ArrayList<>();
-        reviewRatings.add(reviewRating1);
-        reviewRatings.add(reviewRating2);
+    public void testFindAll() {
+        ReviewRating review1 = new ReviewRating("user1", "Great book!", 9);
+        ReviewRating review2 = new ReviewRating("user2", "Not bad", 7);
+        List<ReviewRating> reviewList = new ArrayList<>();
+        reviewList.add(review1);
+        reviewList.add(review2);
 
-        when(reviewRatingRepository.findAll()).thenReturn(reviewRatings);
+        when(reviewRatingRepository.findAll()).thenReturn(reviewList);
 
-        List<ReviewRating> allReviewRatings = reviewRatingService.findAll();
-        assertEquals(reviewRatings, allReviewRatings);
+        List<ReviewRating> allReviews = reviewRatingService.findAll();
+
+        assertEquals(2, allReviews.size());
         verify(reviewRatingRepository, times(1)).findAll();
     }
 
     @Test
-    void testFindById() {
-        when(reviewRatingRepository.findById("1")).thenReturn(Optional.of(reviewRating1));
+    public void testFindById() {
+        ReviewRating reviewRating = new ReviewRating("user1", "Great book!", 9);
+        when(reviewRatingRepository.findById("1")).thenReturn(Optional.of(reviewRating));
 
-        Optional<ReviewRating> foundReviewRating = reviewRatingService.findById("1");
-        assertEquals(Optional.of(reviewRating1), foundReviewRating);
+        Optional<ReviewRating> foundReview = reviewRatingService.findById("1");
+
+        assertTrue(foundReview.isPresent());
+        assertEquals("user1", foundReview.get().getUsername());
         verify(reviewRatingRepository, times(1)).findById("1");
     }
 
     @Test
-    void testUpdateReviewRating() {
-        when(reviewRatingRepository.findById("1")).thenReturn(Optional.of(reviewRating1));
-        when(reviewRatingRepository.save(any(ReviewRating.class))).thenReturn(reviewRating1);
+    public void testUpdateReviewRating() {
+        ReviewRating existingReview = new ReviewRating("user1", "Great book!", 9);
+        ReviewRating updatedReview = new ReviewRating("user1", "Good book!", 8);
+        updatedReview.setReviewId(existingReview.getReviewId());
 
-        ReviewRating updatedReviewRating = reviewRatingService.updateReviewRating("1", reviewRating1);
-        assertEquals(reviewRating1, updatedReviewRating);
-        verify(reviewRatingRepository, times(1)).findById("1");
-        verify(reviewRatingRepository, times(1)).save(reviewRating1);
+        when(reviewRatingRepository.findById(existingReview.getReviewId())).thenReturn(Optional.of(existingReview));
+        when(reviewRatingRepository.save(any(ReviewRating.class))).thenReturn(updatedReview);
+
+        ReviewRating result = reviewRatingService.updateReviewRating(existingReview.getReviewId(), updatedReview);
+
+        assertNotNull(result);
+        assertEquals("Good book!", result.getReview());
+        verify(reviewRatingRepository, times(1)).findById(existingReview.getReviewId());
+        verify(reviewRatingRepository, times(1)).save(updatedReview);
     }
 
     @Test
-    void testDeleteReviewRating() {
-        doNothing().when(reviewRatingRepository).deleteById("1");
+    public void testDeleteReviewRating() {
+        ReviewRating reviewRating = new ReviewRating("user1", "Great book!", 9);
+        when(reviewRatingRepository.findById("1")).thenReturn(Optional.of(reviewRating));
 
         reviewRatingService.deleteReviewRating("1");
+
+        verify(reviewRatingRepository, times(1)).findById("1");
         verify(reviewRatingRepository, times(1)).deleteById("1");
+    }
+
+    @Test
+    public void testGetAverageRatingByIsbn() {
+        Book book = new Book();
+        book.setIsbn("1234567890");
+
+        ReviewRating review1 = new ReviewRating("user1", "Great book!", 9);
+        review1.setBook(book);
+        ReviewRating review2 = new ReviewRating("user2", "Not bad", 7);
+        review2.setBook(book);
+        List<ReviewRating> reviews = new ArrayList<>();
+        reviews.add(review1);
+        reviews.add(review2);
+
+        when(reviewRatingRepository.findByBookIsbn("1234567890")).thenReturn(reviews);
+
+        double averageRating = reviewRatingService.getAverageRatingByIsbn("1234567890");
+
+        assertEquals(8.0, averageRating);
+        verify(reviewRatingRepository, times(1)).findByBookIsbn("1234567890");
     }
 }

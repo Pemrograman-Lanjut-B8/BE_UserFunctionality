@@ -1,7 +1,10 @@
 package id.ac.ui.cs.advprog.userfunctionality.model;
 
 import jakarta.persistence.*;
+
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -11,6 +14,8 @@ import java.util.UUID;
 @Table(name = "review_rating")
 public class ReviewRating {
 
+    @Setter
+    @Getter
     @Id
     @Column(name = "review_id")
     private String reviewId;
@@ -42,10 +47,6 @@ public class ReviewRating {
         setRating(rating);
     }
 
-    public void setReviewId(String reviewId) {
-        this.reviewId = reviewId;
-    }
-
     public void setReview(String review) {
         if (!review.isEmpty()) {
             this.review = review;
@@ -62,9 +63,5 @@ public class ReviewRating {
         } else {
             this.rating = rating;
         }
-    }
-
-    public String getReviewId() {
-        return reviewId;
     }
 }

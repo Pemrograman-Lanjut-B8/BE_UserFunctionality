@@ -2,7 +2,6 @@ package id.ac.ui.cs.advprog.userfunctionality.service.command;
 
 import id.ac.ui.cs.advprog.userfunctionality.model.ReviewRating;
 import id.ac.ui.cs.advprog.userfunctionality.repository.ReviewRatingRepository;
-import id.ac.ui.cs.advprog.userfunctionality.service.command.Command;
 
 import java.util.Optional;
 
@@ -19,9 +18,8 @@ public class DeleteReviewRatingCommand implements Command {
     public Optional<ReviewRating> execute() {
         Optional<ReviewRating> deletingReview = reviewRatingRepository.findById(reviewId);
         deletingReview.ifPresent(reviewRating -> {
-            reviewRatingRepository.deleteById(reviewRating.getReviewId());
+            reviewRatingRepository.deleteById(reviewId);
         });
         return deletingReview;
-
     }
 }

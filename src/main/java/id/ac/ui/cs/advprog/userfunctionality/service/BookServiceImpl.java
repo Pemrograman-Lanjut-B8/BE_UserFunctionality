@@ -4,6 +4,10 @@ import id.ac.ui.cs.advprog.userfunctionality.dto.BookTopDTO;
 import id.ac.ui.cs.advprog.userfunctionality.model.Book;
 import id.ac.ui.cs.advprog.userfunctionality.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,11 +21,36 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<BookTopDTO> getBookRecommendation() {
         return bookRepository.findTop5Book();
+
+    }
+
+    public List<Book> getAllBooks() {
+        return bookRepository.findAll();
+    }
+
+    public Page<Book> searchBooks(String judulBuku, String penulis, String sortBy, String sortDirection, int pageIndex) {
+        Pageable pageable = PageRequest.of(pageIndex - 1, 25, Sort.Direction.fromString(sortDirection), sortBy);
+        if (judulBuku != null && penulis != null) {
+            return bookRepository.findByJudulBukuContainingIgnoreCaseAndPenulisContainingIgnoreCase(judulBuku, penulis, pageable);
+        } else if (judulBuku != null) {
+            return bookRepository.findByJudulBukuContainingIgnoreCase(judulBuku, pageable);
+        } else if (penulis != null) {
+            return bookRepository.findByPenulisContainingIgnoreCase(penulis, pageable);
+        } else {
+            return bookRepository.findAll(pageable);
+        }
     }
 
     @Override
-    public Book findByIsbn(String isbn) {
-        return bookRepository.findByIsbn(isbn).orElse(null);
+    public Book getBookById(String isbn) {
+        return bookRepository.findById(isbn).orElseThrow(() -> new RuntimeException("Book not found"));
+
+    }
+
+    @Override
+    public Book findByIsbn (String isbn){
+        return bookRepository.findByIsbn(isbn);
+
     }
 
 }
