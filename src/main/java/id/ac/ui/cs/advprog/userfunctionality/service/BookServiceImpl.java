@@ -40,12 +40,9 @@ public class BookServiceImpl implements BookService {
         }
     }
 
-    public Book getBookById(String isbn) {
-        return bookRepository.findById(isbn).orElseThrow(() -> new RuntimeException("Book not found"));
-
     @Override
     public Book findByIsbn(String isbn) {
-        return bookRepository.findByIsbn(isbn).orElse(null);
+        return bookRepository.findByIsbn(isbn).orElseThrow(() -> new RuntimeException("Book not found"));
 
     }
 }
