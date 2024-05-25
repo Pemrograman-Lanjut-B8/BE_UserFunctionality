@@ -39,4 +39,9 @@ public class BookServiceImpl implements BookService {
 
         return bookRepository.findTop5ByOrderByRatingDesc();
     }
+
+    @Override
+    public Book findByIsbn(String isbn) {
+        return bookRepository.findByIsbn(isbn).orElse(null);
+    }
 }

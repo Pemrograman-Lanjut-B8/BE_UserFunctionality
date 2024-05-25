@@ -1,11 +1,11 @@
 package id.ac.ui.cs.advprog.userfunctionality.model;
 
-import lombok.Data;
+import jakarta.persistence.*;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -14,6 +14,8 @@ import java.util.UUID;
 @Table(name = "review_rating")
 public class ReviewRating {
 
+    @Setter
+    @Getter
     @Id
     @Column(name = "review_id")
     private String reviewId;
@@ -21,8 +23,8 @@ public class ReviewRating {
     @Column(name = "username")
     private String username;
 
-    @Column(name = "book_id")
-    private String bookId;
+    @ManyToOne
+    private Book book;
 
     @Column(name = "review")
     private String review;
@@ -34,17 +36,15 @@ public class ReviewRating {
     private LocalDateTime dateTime;
 
     public ReviewRating() {
+        this.reviewId = UUID.randomUUID().toString();
+        this.dateTime = LocalDateTime.now();
     }
 
-    public ReviewRating(String username, String bookId, String review, int rating) {
-        this.reviewId = UUID.randomUUID().toString();
+    public ReviewRating(String username, String review, int rating) {
+        this();
         this.username = username;
-        this.bookId = bookId;
-        this.review = review;
         setReview(review);
-        this.rating = rating;
         setRating(rating);
-        this.dateTime = LocalDateTime.now();
     }
 
     public void setReview(String review) {
@@ -63,9 +63,5 @@ public class ReviewRating {
         } else {
             this.rating = rating;
         }
-    }
-
-    public String getReviewId(){
-        return reviewId;
     }
 }

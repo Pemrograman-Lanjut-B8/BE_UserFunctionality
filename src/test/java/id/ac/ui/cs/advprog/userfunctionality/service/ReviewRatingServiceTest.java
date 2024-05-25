@@ -3,10 +3,8 @@ package id.ac.ui.cs.advprog.userfunctionality.service;
 import id.ac.ui.cs.advprog.userfunctionality.model.Book;
 import id.ac.ui.cs.advprog.userfunctionality.model.ReviewRating;
 import id.ac.ui.cs.advprog.userfunctionality.repository.ReviewRatingRepository;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -19,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class ReviewRatingServiceImplTest {
+public class ReviewRatingServiceTest {
 
     @Mock
     private ReviewRatingRepository reviewRatingRepository;
