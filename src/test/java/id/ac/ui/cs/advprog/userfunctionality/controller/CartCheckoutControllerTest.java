@@ -13,7 +13,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -34,8 +33,7 @@ public class CartCheckoutControllerTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(cartCheckoutController)
-                .build();
+        mockMvc = MockMvcBuilders.standaloneSetup(cartCheckoutController).build();
     }
 
     @Test
@@ -45,8 +43,7 @@ public class CartCheckoutControllerTest {
         cartCheckoutDTO.setUserId("user123");
         cartCheckoutDTO.setTotalPrice(100.0);
 
-        when(cartCheckoutService.findCartCheckoutById(1L))
-                .thenReturn(CompletableFuture.completedFuture(cartCheckoutDTO));
+        when(cartCheckoutService.findCartCheckoutById(1L)).thenReturn(cartCheckoutDTO);
 
         mockMvc.perform(get("/cart/checkout/1"))
                 .andExpect(status().isOk())
@@ -57,8 +54,7 @@ public class CartCheckoutControllerTest {
 
     @Test
     public void testGetCartCheckoutNotFound() throws Exception {
-        when(cartCheckoutService.findCartCheckoutById(1L))
-                .thenReturn(CompletableFuture.completedFuture(null));
+        when(cartCheckoutService.findCartCheckoutById(1L)).thenReturn(null);
 
         mockMvc.perform(get("/cart/checkout/1"))
                 .andExpect(status().isNotFound());
@@ -70,8 +66,7 @@ public class CartCheckoutControllerTest {
         cartCheckoutDTO.setId(1L);
         cartCheckoutDTO.setUserId("user123");
 
-        when(cartCheckoutService.createCartCheckout(any(CartCheckoutDTO.class)))
-                .thenReturn(CompletableFuture.completedFuture(cartCheckoutDTO));
+        when(cartCheckoutService.createCartCheckout(any(CartCheckoutDTO.class))).thenReturn(cartCheckoutDTO);
 
         String cartCheckoutJson = "{\"id\":1, \"userId\":\"user123\", \"totalPrice\":100.0, \"status\":\"Pending\", \"items\":[]}";
 
@@ -90,8 +85,7 @@ public class CartCheckoutControllerTest {
         cartCheckoutDTO.setId(1L);
         allCartCheckouts.add(cartCheckoutDTO);
 
-        when(cartCheckoutService.findAll())
-                .thenReturn(CompletableFuture.completedFuture(allCartCheckouts));
+        when(cartCheckoutService.findAll()).thenReturn(allCartCheckouts);
 
         mockMvc.perform(get("/cart/list"))
                 .andExpect(status().isOk())
@@ -105,8 +99,7 @@ public class CartCheckoutControllerTest {
         cartCheckoutDTO.setId(1L);
         cartCheckoutDTO.setUserId("updatedUser");
 
-        when(cartCheckoutService.updateCartCheckout(eq(1L), any(CartCheckoutDTO.class)))
-                .thenReturn(CompletableFuture.completedFuture(cartCheckoutDTO));
+        when(cartCheckoutService.updateCartCheckout(eq(1L), any(CartCheckoutDTO.class))).thenReturn(cartCheckoutDTO);
 
         String cartCheckoutJson = "{\"id\":1, \"userId\":\"updatedUser\", \"totalPrice\":100.0, \"status\":\"Pending\", \"items\":[]}";
 
@@ -120,8 +113,7 @@ public class CartCheckoutControllerTest {
 
     @Test
     public void testEditCartCheckoutNotFound() throws Exception {
-        when(cartCheckoutService.updateCartCheckout(eq(1L), any(CartCheckoutDTO.class)))
-                .thenReturn(CompletableFuture.completedFuture(null));
+        when(cartCheckoutService.updateCartCheckout(eq(1L), any(CartCheckoutDTO.class))).thenReturn(null);
 
         String cartCheckoutJson = "{\"id\":1, \"userId\":\"updatedUser\", \"totalPrice\":100.0, \"status\":\"Pending\", \"items\":[]}";
 
@@ -133,8 +125,7 @@ public class CartCheckoutControllerTest {
 
     @Test
     public void testDeleteCartCheckout() throws Exception {
-        when(cartCheckoutService.deleteCartCheckout(1L))
-                .thenReturn(CompletableFuture.completedFuture(true));
+        when(cartCheckoutService.deleteCartCheckout(1L)).thenReturn(true);
 
         mockMvc.perform(delete("/cart/delete/1"))
                 .andExpect(status().isNoContent());
@@ -142,8 +133,7 @@ public class CartCheckoutControllerTest {
 
     @Test
     public void testDeleteCartCheckoutNotFound() throws Exception {
-        when(cartCheckoutService.deleteCartCheckout(1L))
-                .thenReturn(CompletableFuture.completedFuture(false));
+        when(cartCheckoutService.deleteCartCheckout(1L)).thenReturn(false);
 
         mockMvc.perform(delete("/cart/delete/1"))
                 .andExpect(status().isNotFound());
@@ -151,14 +141,57 @@ public class CartCheckoutControllerTest {
 
     @Test
     public void testStoreCheckedOutBooks() throws Exception {
-        when(cartCheckoutService.storeCheckedOutBooks(any(CartCheckoutDTO.class)))
-                .thenReturn(CompletableFuture.completedFuture(null));
-
-        String cartCheckoutJson = "{\"id\":1, \"userId\":\"user123\", \"totalPrice\":100.0, \"status\":\"Pending\", \"items\":[]}";
-
         mockMvc.perform(post("/cart/inventory")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(cartCheckoutJson))
+                        .content("{\"id\":1, \"userId\":\"user123\", \"totalPrice\":100.0, \"status\":\"Pending\", \"items\":[]}"))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void testCheckoutCart() throws Exception {
+        when(cartCheckoutService.updateCartStatus(1L, "Menunggu Konfirmasi Pembayaran")).thenReturn(true);
+
+        mockMvc.perform(post("/cart/status/checkout/1"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testCheckoutCartNotFound() throws Exception {
+        when(cartCheckoutService.updateCartStatus(1L, "Menunggu Konfirmasi Pembayaran")).thenReturn(false);
+
+        mockMvc.perform(post("/cart/status/checkout/1"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testPayCart() throws Exception {
+        when(cartCheckoutService.updateCartStatus(1L, "Menunggu Pengiriman Buku")).thenReturn(true);
+
+        mockMvc.perform(post("/cart/status/pay/1"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testPayCartNotFound() throws Exception {
+        when(cartCheckoutService.updateCartStatus(1L, "Menunggu Pengiriman Buku")).thenReturn(false);
+
+        mockMvc.perform(post("/cart/status/pay/1"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testCancelCart() throws Exception {
+        when(cartCheckoutService.updateCartStatus(1L, "Pembelian Dibatalkan")).thenReturn(true);
+
+        mockMvc.perform(post("/cart/status/cancel/1"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testCancelCartNotFound() throws Exception {
+        when(cartCheckoutService.updateCartStatus(1L, "Pembelian Dibatalkan")).thenReturn(false);
+
+        mockMvc.perform(post("/cart/status/cancel/1"))
+                .andExpect(status().isNotFound());
     }
 }

@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/cart")
@@ -20,55 +19,82 @@ public class CartCheckoutController {
     }
 
     @GetMapping("/checkout/{cartId}")
-    public CompletableFuture<ResponseEntity<CartCheckoutDTO>> getCartCheckout(@PathVariable Long cartId) {
-        return cartCheckoutService.findCartCheckoutById(cartId)
-                .thenCompose(checkoutDTO -> {
-                    if (checkoutDTO != null) {
-                        return cartCheckoutService.storeCheckedOutBooks(checkoutDTO)
-                                .thenApply(v -> ResponseEntity.ok(checkoutDTO));
-                    } else {
-                        return CompletableFuture.completedFuture(ResponseEntity.notFound().build());
-                    }
-                });
+    public ResponseEntity<CartCheckoutDTO> getCartCheckout(@PathVariable Long cartId) {
+        CartCheckoutDTO checkoutDTO = cartCheckoutService.findCartCheckoutById(cartId);
+        if (checkoutDTO != null) {
+            cartCheckoutService.storeCheckedOutBooks(checkoutDTO);
+            return ResponseEntity.ok(checkoutDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/createCart")
-    public CompletableFuture<ResponseEntity<CartCheckoutDTO>> createCartCheckout(@RequestBody CartCheckoutDTO cartCheckout) {
-        return cartCheckoutService.createCartCheckout(cartCheckout)
-                .thenCompose(createdCartCheckout -> cartCheckoutService.storeCheckedOutBooks(createdCartCheckout)
-                        .thenApply(v -> ResponseEntity.status(HttpStatus.CREATED).body(createdCartCheckout)));
+    public ResponseEntity<CartCheckoutDTO> createCartCheckout(@RequestBody CartCheckoutDTO cartCheckout) {
+        CartCheckoutDTO createdCartCheckout = cartCheckoutService.createCartCheckout(cartCheckout);
+        cartCheckoutService.storeCheckedOutBooks(createdCartCheckout);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCartCheckout);
     }
 
     @GetMapping("/list")
-    public CompletableFuture<ResponseEntity<List<CartCheckoutDTO>>> cartCheckoutList() {
-        return cartCheckoutService.findAll()
-                .thenApply(ResponseEntity::ok);
-    }
-
-    @GetMapping("/edit/{cartId}")
-    public CompletableFuture<ResponseEntity<CartCheckoutDTO>> editCartCheckoutPage(@PathVariable Long cartId) {
-        return cartCheckoutService.findCartCheckoutById(cartId)
-                .thenApply(cartCheckout ->
-                        cartCheckout != null ? ResponseEntity.ok(cartCheckout) : ResponseEntity.notFound().build());
+    public ResponseEntity<List<CartCheckoutDTO>> cartCheckoutList() {
+        List<CartCheckoutDTO> allCartCheckouts = cartCheckoutService.findAll();
+        return ResponseEntity.ok(allCartCheckouts);
     }
 
     @PutMapping("/edit/{cartId}")
-    public CompletableFuture<ResponseEntity<CartCheckoutDTO>> editCartCheckout(@PathVariable Long cartId, @RequestBody CartCheckoutDTO cartCheckout) {
-        return cartCheckoutService.updateCartCheckout(cartId, cartCheckout)
-                .thenApply(updatedCartCheckout ->
-                        updatedCartCheckout != null ? ResponseEntity.ok(updatedCartCheckout) : ResponseEntity.notFound().build());
+    public ResponseEntity<CartCheckoutDTO> editCartCheckout(@PathVariable Long cartId, @RequestBody CartCheckoutDTO cartCheckout) {
+        CartCheckoutDTO updatedCartCheckout = cartCheckoutService.updateCartCheckout(cartId, cartCheckout);
+        if (updatedCartCheckout != null) {
+            return ResponseEntity.ok(updatedCartCheckout);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/delete/{cartId}")
-    public CompletableFuture<ResponseEntity<Void>> deleteCartCheckout(@PathVariable Long cartId) {
-        return cartCheckoutService.deleteCartCheckout(cartId)
-                .thenApply(deleted ->
-                        deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build());
+    public ResponseEntity<Void> deleteCartCheckout(@PathVariable Long cartId) {
+        boolean deleted = cartCheckoutService.deleteCartCheckout(cartId);
+        if (deleted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/inventory")
-    public CompletableFuture<ResponseEntity<Void>> storeCheckedOutBooks(@RequestBody CartCheckoutDTO cartCheckoutDTO) {
-        return cartCheckoutService.storeCheckedOutBooks(cartCheckoutDTO)
-                .thenApply(v -> ResponseEntity.status(HttpStatus.CREATED).build());
+    public ResponseEntity<Void> storeCheckedOutBooks(@RequestBody CartCheckoutDTO cartCheckoutDTO) {
+        cartCheckoutService.storeCheckedOutBooks(cartCheckoutDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/status/checkout/{cartId}")
+    public ResponseEntity<Void> checkoutCart(@PathVariable Long cartId) {
+        boolean statusUpdated = cartCheckoutService.updateCartStatus(cartId, "Menunggu Konfirmasi Pembayaran");
+        if (statusUpdated) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/status/pay/{cartId}")
+    public ResponseEntity<Void> payCart(@PathVariable Long cartId) {
+        boolean statusUpdated = cartCheckoutService.updateCartStatus(cartId, "Menunggu Pengiriman Buku");
+        if (statusUpdated) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/status/cancel/{cartId}")
+    public ResponseEntity<Void> cancelCart(@PathVariable Long cartId) {
+        boolean statusUpdated = cartCheckoutService.updateCartStatus(cartId, "Pembelian Dibatalkan");
+        if (statusUpdated) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
