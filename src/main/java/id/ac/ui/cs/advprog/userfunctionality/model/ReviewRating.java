@@ -34,25 +34,38 @@ public class ReviewRating {
     private LocalDateTime dateTime;
 
     public ReviewRating() {
+    }
+
+    public ReviewRating(String username, String bookId, String review, int rating) {
         this.reviewId = UUID.randomUUID().toString();
+        this.username = username;
+        this.bookId = bookId;
+        this.review = review;
+        setReview(review);
+        this.rating = rating;
+        setRating(rating);
         this.dateTime = LocalDateTime.now();
     }
 
-//    public void setReview(String review) {
-//        if (!review.isEmpty()) {
-//            this.review = review;
-//        } else {
-//            throw new IllegalArgumentException("Review harus Anda isi!");
-//        }
-//    }
-//
-//    public void setRating(int rating) {
-//        if (rating < 0) {
-//            this.rating = 0;
-//        } else if (rating > 10) {
-//            this.rating = 10;
-//        } else {
-//            this.rating = rating;
-//        }
-//    }
+    public void setReview(String review) {
+        if (!review.isEmpty()) {
+            this.review = review;
+        } else {
+            throw new IllegalArgumentException("Review harus Anda isi!");
+        }
+    }
+
+    public void setRating(int rating) {
+        if (rating < 0) {
+            this.rating = 0;
+        } else if (rating > 10) {
+            this.rating = 10;
+        } else {
+            this.rating = rating;
+        }
+    }
+
+    public String getReviewId(){
+        return reviewId;
+    }
 }
