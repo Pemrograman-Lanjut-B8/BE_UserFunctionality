@@ -25,22 +25,24 @@ public class ReviewRatingController {
     @PostMapping("/create")
     public ResponseEntity<Object> createReviewRating(@RequestBody ReviewRatingDTO reviewRatingDTO) {
         try {
-            // Find book by ISBN
+            // Cari buku berdasarkan ISBN
             Book book = bookService.findByIsbn(reviewRatingDTO.getBookIsbn());
             if (book == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found");
             }
 
-            // Create ReviewRating object
+            // Buat objek ReviewRating baru
             ReviewRating reviewRating = new ReviewRating();
             reviewRating.setUsername(reviewRatingDTO.getUsername());
             reviewRating.setReview(reviewRatingDTO.getReview());
             reviewRating.setRating(reviewRatingDTO.getRating());
             reviewRating.setBook(book);
 
+            // Simpan review dan rating yang baru dibuat
             ReviewRating createdReviewRating = reviewRatingService.createReviewRating(reviewRating);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdReviewRating);
         } catch (Exception ex) {
+            // Tangani kesalahan dengan memberikan respons HTTP 500
             System.out.println("Error in create review rating: " + ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating review rating");
         }
@@ -51,6 +53,7 @@ public class ReviewRatingController {
         try {
             return ResponseEntity.ok(reviewRatingService.findAll());
         } catch (Exception ex) {
+            // Tangani kesalahan dengan memberikan respons HTTP 500
             System.out.println("Error in list review ratings: " + ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error listing review ratings");
         }
@@ -59,13 +62,13 @@ public class ReviewRatingController {
     @PutMapping("/edit/{reviewId}")
     public ResponseEntity<Object> editReviewRating(@PathVariable("reviewId") String reviewId, @RequestBody ReviewRatingDTO reviewRatingDTO) {
         try {
-            // Find book by ISBN
+            // Cari buku berdasarkan ISBN
             Book book = bookService.findByIsbn(reviewRatingDTO.getBookIsbn());
             if (book == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found");
             }
 
-            // Update ReviewRating object
+            // Update objek ReviewRating yang ada
             ReviewRating updatedReviewRating = new ReviewRating();
             updatedReviewRating.setReviewId(reviewId);
             updatedReviewRating.setUsername(reviewRatingDTO.getUsername());
@@ -73,9 +76,11 @@ public class ReviewRatingController {
             updatedReviewRating.setRating(reviewRatingDTO.getRating());
             updatedReviewRating.setBook(book);
 
+            // Simpan perubahan pada review dan rating
             ReviewRating result = reviewRatingService.updateReviewRating(reviewId, updatedReviewRating);
             return ResponseEntity.ok(result);
         } catch (Exception ex) {
+            // Tangani kesalahan dengan memberikan respons HTTP 500
             System.out.println("Error in edit review rating: " + ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error editing review rating");
         }
@@ -85,8 +90,10 @@ public class ReviewRatingController {
     public ResponseEntity<Object> deleteReviewRating(@PathVariable("reviewId") String reviewId) {
         try {
             reviewRatingService.deleteReviewRating(reviewId);
+            // Berhasil menghapus, kembalikan respons HTTP tanpa konten
             return ResponseEntity.noContent().build();
         } catch (Exception ex) {
+            // Tangani kesalahan dengan memberikan respons HTTP 500
             System.out.println("Error in delete review rating: " + ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -98,12 +105,12 @@ public class ReviewRatingController {
             double averageRating = reviewRatingService.getAverageRatingByIsbn(isbn);
             return ResponseEntity.ok(averageRating);
         } catch (Exception ex) {
+            // Tangani kesalahan dengan memberikan respons HTTP 500
             System.out.println("Error in get average rating by isbn: " + ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error getting average rating by isbn");
         }
     }
 
-    // ReviewRatingDTO class
     @Data
     static class ReviewRatingDTO {
         private String username;

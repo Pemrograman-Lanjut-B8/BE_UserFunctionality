@@ -18,8 +18,8 @@ public class DeleteReviewRatingCommand implements Command {
     public Optional<ReviewRating> execute() {
         Optional<ReviewRating> deletingReview = reviewRatingRepository.findById(reviewId);
         deletingReview.ifPresent(reviewRating -> {
-            reviewRatingRepository.deleteById(reviewId); // Menggunakan reviewId dari konstruktor
+            reviewRatingRepository.deleteById(reviewId);
         });
-        return deletingReview; // Mengembalikan objek ReviewRating yang dihapus, jika ada
+        return deletingReview;
     }
 }
