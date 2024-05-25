@@ -6,8 +6,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +20,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 public class CartCheckoutControllerTest {
 
@@ -32,7 +33,9 @@ public class CartCheckoutControllerTest {
 
     @BeforeEach
     public void setUp() {
-        mockMvc = standaloneSetup(cartCheckoutController).build();
+        MockitoAnnotations.openMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(cartCheckoutController)
+                .build();
     }
 
     @Test
@@ -70,9 +73,11 @@ public class CartCheckoutControllerTest {
         when(cartCheckoutService.createCartCheckout(any(CartCheckoutDTO.class)))
                 .thenReturn(CompletableFuture.completedFuture(cartCheckoutDTO));
 
+        String cartCheckoutJson = "{\"id\":1, \"userId\":\"user123\", \"totalPrice\":100.0, \"status\":\"Pending\", \"items\":[]}";
+
         mockMvc.perform(post("/cart/createCart")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\":1, \"userId\":\"user123\"}"))
+                        .content(cartCheckoutJson))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.userId").value("user123"));
@@ -103,9 +108,11 @@ public class CartCheckoutControllerTest {
         when(cartCheckoutService.updateCartCheckout(eq(1L), any(CartCheckoutDTO.class)))
                 .thenReturn(CompletableFuture.completedFuture(cartCheckoutDTO));
 
+        String cartCheckoutJson = "{\"id\":1, \"userId\":\"updatedUser\", \"totalPrice\":100.0, \"status\":\"Pending\", \"items\":[]}";
+
         mockMvc.perform(put("/cart/edit/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\":1, \"userId\":\"updatedUser\"}"))
+                        .content(cartCheckoutJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.userId").value("updatedUser"));
@@ -116,9 +123,11 @@ public class CartCheckoutControllerTest {
         when(cartCheckoutService.updateCartCheckout(eq(1L), any(CartCheckoutDTO.class)))
                 .thenReturn(CompletableFuture.completedFuture(null));
 
+        String cartCheckoutJson = "{\"id\":1, \"userId\":\"updatedUser\", \"totalPrice\":100.0, \"status\":\"Pending\", \"items\":[]}";
+
         mockMvc.perform(put("/cart/edit/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\":1, \"userId\":\"updatedUser\"}"))
+                        .content(cartCheckoutJson))
                 .andExpect(status().isNotFound());
     }
 
@@ -138,5 +147,18 @@ public class CartCheckoutControllerTest {
 
         mockMvc.perform(delete("/cart/delete/1"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testStoreCheckedOutBooks() throws Exception {
+        when(cartCheckoutService.storeCheckedOutBooks(any(CartCheckoutDTO.class)))
+                .thenReturn(CompletableFuture.completedFuture(null));
+
+        String cartCheckoutJson = "{\"id\":1, \"userId\":\"user123\", \"totalPrice\":100.0, \"status\":\"Pending\", \"items\":[]}";
+
+        mockMvc.perform(post("/cart/inventory")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cartCheckoutJson))
+                .andExpect(status().isCreated());
     }
 }

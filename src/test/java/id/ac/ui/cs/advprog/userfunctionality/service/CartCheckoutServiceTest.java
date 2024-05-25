@@ -153,13 +153,15 @@ public class CartCheckoutServiceTest {
         existingCartCheckout.setStatus(existingCartCheckoutDTO.getStatus());
 
         CartCheckoutDTO updateDTO = createCartCheckoutDTO();
-        updateDTO.setUserId(UUID.randomUUID().toString());
+        updateDTO.setId(cartId);
+        updateDTO.setUserId(existingCartCheckoutDTO.getUserId());
         updateDTO.setTotalPrice(150.0);
 
         when(cartCheckoutRepository.findById(cartId)).thenReturn(Optional.of(existingCartCheckout));
         when(cartCheckoutRepository.save(any(CartCheckout.class)))
                 .thenReturn(existingCartCheckout);
 
+        // Simulate the update
         existingCartCheckout.setUser(user);
         existingCartCheckout.setTotalPrice(updateDTO.getTotalPrice());
 

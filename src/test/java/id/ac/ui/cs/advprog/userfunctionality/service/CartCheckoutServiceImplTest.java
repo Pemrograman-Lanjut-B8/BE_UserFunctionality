@@ -115,7 +115,10 @@ public class CartCheckoutServiceImplTest {
     @Test
     public void testFindAll() {
         List<CartCheckout> cartCheckouts = new ArrayList<>();
+        UserEntity user = createUserEntity(UUID.randomUUID().toString());
         CartCheckout cartCheckout = new CartCheckout();
+        cartCheckout.setUser(user);
+        cartCheckout.setItems(new ArrayList<>());
         cartCheckouts.add(cartCheckout);
 
         when(cartCheckoutRepository.findAll()).thenReturn(cartCheckouts);
@@ -164,7 +167,8 @@ public class CartCheckoutServiceImplTest {
         existingCartCheckout.setStatus(existingCartCheckoutDTO.getStatus());
 
         CartCheckoutDTO updateDTO = createCartCheckoutDTO();
-        updateDTO.setUserId(UUID.randomUUID().toString());
+        updateDTO.setId(cartId);
+        updateDTO.setUserId(existingCartCheckoutDTO.getUserId());
         updateDTO.setTotalPrice(150.0);
 
         when(cartCheckoutRepository.findById(cartId)).thenReturn(Optional.of(existingCartCheckout));
