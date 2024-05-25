@@ -1,63 +1,74 @@
 package id.ac.ui.cs.advprog.userfunctionality.controller;
 
-import id.ac.ui.cs.advprog.userfunctionality.model.CartCheckout;
+import id.ac.ui.cs.advprog.userfunctionality.dto.CartCheckoutDTO;
 import id.ac.ui.cs.advprog.userfunctionality.service.CartCheckoutService;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
-@Controller
+@RestController
 @RequestMapping("/cart")
 public class CartCheckoutController {
 
     private final CartCheckoutService cartCheckoutService;
 
-    @Autowired
     public CartCheckoutController(CartCheckoutService cartCheckoutService) {
         this.cartCheckoutService = cartCheckoutService;
     }
 
-    @GetMapping("/create")
-    public String createCartCheckoutPage(Model model) {
-        CartCheckout cartCheckout = new CartCheckout();
-        model.addAttribute("cartCheckout", cartCheckout);
-        return "CreateCartCheckout";
+    @GetMapping("/checkout/{cartId}")
+    public CompletableFuture<ResponseEntity<CartCheckoutDTO>> getCartCheckout(@PathVariable Long cartId) {
+        return cartCheckoutService.findCartCheckoutById(cartId)
+                .thenCompose(checkoutDTO -> {
+                    if (checkoutDTO != null) {
+                        return cartCheckoutService.storeCheckedOutBooks(checkoutDTO)
+                                .thenApply(v -> ResponseEntity.ok(checkoutDTO));
+                    } else {
+                        return CompletableFuture.completedFuture(ResponseEntity.notFound().build());
+                    }
+                });
     }
 
-    @PostMapping("/create")
-    public String createCartCheckoutPost(@ModelAttribute CartCheckout cartCheckout, Model model) {
-        cartCheckoutService.create(cartCheckout);
-        return "redirect:list";
+    @PostMapping("/createCart")
+    public CompletableFuture<ResponseEntity<CartCheckoutDTO>> createCartCheckout(@RequestBody CartCheckoutDTO cartCheckout) {
+        return cartCheckoutService.createCartCheckout(cartCheckout)
+                .thenCompose(createdCartCheckout -> cartCheckoutService.storeCheckedOutBooks(createdCartCheckout)
+                        .thenApply(v -> ResponseEntity.status(HttpStatus.CREATED).body(createdCartCheckout)));
     }
 
     @GetMapping("/list")
-    public String cartCheckoutListPage(Model model) {
-        List<CartCheckout> allCartCheckouts = cartCheckoutService.findAll();
-        model.addAttribute("cartCheckouts", allCartCheckouts);
-        return "CartCheckoutList";
+    public CompletableFuture<ResponseEntity<List<CartCheckoutDTO>>> cartCheckoutList() {
+        return cartCheckoutService.findAll()
+                .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/edit/{cartId}")
-    public String editCartCheckoutPage(Model model, @PathVariable("cartId") Long cartId) {
-        Optional<CartCheckout> cartCheckout = cartCheckoutService.findById(cartId);
-        cartCheckout.ifPresent(value -> model.addAttribute("cartCheckout", value));
-        return "EditCartCheckout";
+    public CompletableFuture<ResponseEntity<CartCheckoutDTO>> editCartCheckoutPage(@PathVariable Long cartId) {
+        return cartCheckoutService.findCartCheckoutById(cartId)
+                .thenApply(cartCheckout ->
+                        cartCheckout != null ? ResponseEntity.ok(cartCheckout) : ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/edit/{cartId}")
-    public String editCartCheckoutPost(@ModelAttribute CartCheckout cartCheckout, Model model, @PathVariable("cartId") Long cartId) {
-        cartCheckoutService.update(cartId, cartCheckout);
-        return "redirect:/cart/list";
+    @PutMapping("/edit/{cartId}")
+    public CompletableFuture<ResponseEntity<CartCheckoutDTO>> editCartCheckout(@PathVariable Long cartId, @RequestBody CartCheckoutDTO cartCheckout) {
+        return cartCheckoutService.updateCartCheckout(cartId, cartCheckout)
+                .thenApply(updatedCartCheckout ->
+                        updatedCartCheckout != null ? ResponseEntity.ok(updatedCartCheckout) : ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/delete/{cartId}")
-    public String deleteCartCheckoutGet(Model model, @PathVariable("cartId") Long cartId) {
-        cartCheckoutService.delete(cartId);
-        return "redirect:/cart/list";
+    @DeleteMapping("/delete/{cartId}")
+    public CompletableFuture<ResponseEntity<Void>> deleteCartCheckout(@PathVariable Long cartId) {
+        return cartCheckoutService.deleteCartCheckout(cartId)
+                .thenApply(deleted ->
+                        deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/inventory")
+    public CompletableFuture<ResponseEntity<Void>> storeCheckedOutBooks(@RequestBody CartCheckoutDTO cartCheckoutDTO) {
+        return cartCheckoutService.storeCheckedOutBooks(cartCheckoutDTO)
+                .thenApply(v -> ResponseEntity.status(HttpStatus.CREATED).build());
     }
 }

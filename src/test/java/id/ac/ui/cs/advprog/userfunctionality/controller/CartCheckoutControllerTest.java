@@ -1,100 +1,142 @@
 package id.ac.ui.cs.advprog.userfunctionality.controller;
 
-import id.ac.ui.cs.advprog.userfunctionality.model.CartCheckout;
+import id.ac.ui.cs.advprog.userfunctionality.dto.CartCheckoutDTO;
 import id.ac.ui.cs.advprog.userfunctionality.service.CartCheckoutService;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.ui.Model;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 public class CartCheckoutControllerTest {
 
-    private CartCheckoutController cartCheckoutController;
+    private MockMvc mockMvc;
+
+    @Mock
     private CartCheckoutService cartCheckoutService;
-    private Model model;
+
+    @InjectMocks
+    private CartCheckoutController cartCheckoutController;
 
     @BeforeEach
     public void setUp() {
-        cartCheckoutService = mock(CartCheckoutService.class);
-        model = mock(Model.class);
-        cartCheckoutController = new CartCheckoutController(cartCheckoutService);
+        mockMvc = standaloneSetup(cartCheckoutController).build();
     }
 
     @Test
-    public void testCreateCartCheckoutPage() {
-        String expectedViewName = "CreateCartCheckout";
-        CartCheckout cartCheckout = new CartCheckout();
-        when(model.addAttribute("cartCheckout", cartCheckout)).thenReturn(model);
+    public void testGetCartCheckout() throws Exception {
+        CartCheckoutDTO cartCheckoutDTO = new CartCheckoutDTO();
+        cartCheckoutDTO.setId(1L);
+        cartCheckoutDTO.setUserId("user123");
+        cartCheckoutDTO.setTotalPrice(100.0);
 
-        String viewName = cartCheckoutController.createCartCheckoutPage(model);
+        when(cartCheckoutService.findCartCheckoutById(1L))
+                .thenReturn(CompletableFuture.completedFuture(cartCheckoutDTO));
 
-        assertEquals(expectedViewName, viewName);
+        mockMvc.perform(get("/cart/checkout/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.userId").value("user123"))
+                .andExpect(jsonPath("$.totalPrice").value(100.0));
     }
 
     @Test
-    public void testCreateCartCheckoutPost() {
-        CartCheckout cartCheckout = new CartCheckout();
-        String expectedRedirectUrl = "redirect:list";
+    public void testGetCartCheckoutNotFound() throws Exception {
+        when(cartCheckoutService.findCartCheckoutById(1L))
+                .thenReturn(CompletableFuture.completedFuture(null));
 
-        String redirectUrl = cartCheckoutController.createCartCheckoutPost(cartCheckout, model);
-
-        verify(cartCheckoutService, times(1)).create(cartCheckout);
-        assertEquals(expectedRedirectUrl, redirectUrl);
+        mockMvc.perform(get("/cart/checkout/1"))
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    public void testCartCheckoutListPage() {
-        String expectedViewName = "CartCheckoutList";
-        List<CartCheckout> cartCheckoutList = new ArrayList<>();
-        when(cartCheckoutService.findAll()).thenReturn(cartCheckoutList);
+    public void testCreateCartCheckout() throws Exception {
+        CartCheckoutDTO cartCheckoutDTO = new CartCheckoutDTO();
+        cartCheckoutDTO.setId(1L);
+        cartCheckoutDTO.setUserId("user123");
 
-        String viewName = cartCheckoutController.cartCheckoutListPage(model);
+        when(cartCheckoutService.createCartCheckout(any(CartCheckoutDTO.class)))
+                .thenReturn(CompletableFuture.completedFuture(cartCheckoutDTO));
 
-        assertEquals(expectedViewName, viewName);
-        verify(model, times(1)).addAttribute("cartCheckouts", cartCheckoutList);
+        mockMvc.perform(post("/cart/createCart")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":1, \"userId\":\"user123\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.userId").value("user123"));
     }
 
     @Test
-    public void testEditCartCheckoutPage() {
-        long cartId = 1L;
-        String expectedViewName = "EditCartCheckout";
-        CartCheckout cartCheckout = new CartCheckout();
-        when(cartCheckoutService.findById(cartId)).thenReturn(Optional.of(cartCheckout));
-        when(model.addAttribute("cartCheckout", cartCheckout)).thenReturn(model);
+    public void testCartCheckoutList() throws Exception {
+        List<CartCheckoutDTO> allCartCheckouts = new ArrayList<>();
+        CartCheckoutDTO cartCheckoutDTO = new CartCheckoutDTO();
+        cartCheckoutDTO.setId(1L);
+        allCartCheckouts.add(cartCheckoutDTO);
 
-        String viewName = cartCheckoutController.editCartCheckoutPage(model, cartId);
+        when(cartCheckoutService.findAll())
+                .thenReturn(CompletableFuture.completedFuture(allCartCheckouts));
 
-        assertEquals(expectedViewName, viewName);
-        verify(model, times(1)).addAttribute("cartCheckout", cartCheckout);
+        mockMvc.perform(get("/cart/list"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value(1L));
     }
 
     @Test
-    public void testEditCartCheckoutPost() {
-        long cartId = 1L;
-        CartCheckout cartCheckout = new CartCheckout();
-        String expectedRedirectUrl = "redirect:/cart/list";
+    public void testEditCartCheckout() throws Exception {
+        CartCheckoutDTO cartCheckoutDTO = new CartCheckoutDTO();
+        cartCheckoutDTO.setId(1L);
+        cartCheckoutDTO.setUserId("updatedUser");
 
-        String redirectUrl = cartCheckoutController.editCartCheckoutPost(cartCheckout, model, cartId);
+        when(cartCheckoutService.updateCartCheckout(eq(1L), any(CartCheckoutDTO.class)))
+                .thenReturn(CompletableFuture.completedFuture(cartCheckoutDTO));
 
-        verify(cartCheckoutService, times(1)).update(cartId, cartCheckout);
-        assertEquals(expectedRedirectUrl, redirectUrl);
+        mockMvc.perform(put("/cart/edit/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":1, \"userId\":\"updatedUser\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.userId").value("updatedUser"));
     }
 
     @Test
-    public void testDeleteCartCheckoutGet() {
-        long cartId = 1L;
-        String expectedRedirectUrl = "redirect:/cart/list";
+    public void testEditCartCheckoutNotFound() throws Exception {
+        when(cartCheckoutService.updateCartCheckout(eq(1L), any(CartCheckoutDTO.class)))
+                .thenReturn(CompletableFuture.completedFuture(null));
 
-        String redirectUrl = cartCheckoutController.deleteCartCheckoutGet(model, cartId);
+        mockMvc.perform(put("/cart/edit/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":1, \"userId\":\"updatedUser\"}"))
+                .andExpect(status().isNotFound());
+    }
 
-        verify(cartCheckoutService, times(1)).delete(cartId);
-        assertEquals(expectedRedirectUrl, redirectUrl);
+    @Test
+    public void testDeleteCartCheckout() throws Exception {
+        when(cartCheckoutService.deleteCartCheckout(1L))
+                .thenReturn(CompletableFuture.completedFuture(true));
+
+        mockMvc.perform(delete("/cart/delete/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testDeleteCartCheckoutNotFound() throws Exception {
+        when(cartCheckoutService.deleteCartCheckout(1L))
+                .thenReturn(CompletableFuture.completedFuture(false));
+
+        mockMvc.perform(delete("/cart/delete/1"))
+                .andExpect(status().isNotFound());
     }
 }

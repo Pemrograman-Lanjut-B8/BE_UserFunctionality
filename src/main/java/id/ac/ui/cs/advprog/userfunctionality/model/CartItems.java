@@ -1,19 +1,30 @@
 package id.ac.ui.cs.advprog.userfunctionality.model;
 
-import lombok.Getter;
+import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Setter;
 
-@Getter @Setter
+@Setter
+@Entity
+@Data
+@Table(name = "cart_items")
 public class CartItems {
-    private long bookId;
-    private String bookTitle;
-    private double price;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
+    private long id;
+
+    @ManyToOne
+    private Book book;
+
+    @Column
     private int quantity;
 
-    public CartItems(long bookId, String bookTitle, double price, int quantity) {
-        this.bookId = bookId;
-        this.bookTitle = bookTitle;
-        this.price = price;
-        this.quantity = quantity;
+    @ManyToOne
+    private UserEntity user;
+
+    public CartItems() {
+
     }
 }
