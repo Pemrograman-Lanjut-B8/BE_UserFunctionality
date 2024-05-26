@@ -1,16 +1,15 @@
 package id.ac.ui.cs.advprog.userfunctionality.controller;
 
-import java.util.List;
-
 import id.ac.ui.cs.advprog.userfunctionality.dto.BookTopDTO;
+import id.ac.ui.cs.advprog.userfunctionality.model.Book;
+import id.ac.ui.cs.advprog.userfunctionality.model.builders.BookBuilderImpl;
+import id.ac.ui.cs.advprog.userfunctionality.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import id.ac.ui.cs.advprog.userfunctionality.model.Book;
-import id.ac.ui.cs.advprog.userfunctionality.model.builders.BookBuilderImpl;
-import id.ac.ui.cs.advprog.userfunctionality.service.BookService;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/book")
@@ -52,6 +51,6 @@ public class BookController {
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/{isbn}")
     public Book getBookById(@PathVariable String isbn) {
-        return bookService.getBookById(isbn);
+        return bookService.findByIsbn(isbn);
     }
 }

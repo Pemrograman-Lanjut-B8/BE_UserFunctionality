@@ -3,18 +3,26 @@ package id.ac.ui.cs.advprog.userfunctionality.service;
 import id.ac.ui.cs.advprog.userfunctionality.dto.BookTopDTO;
 import id.ac.ui.cs.advprog.userfunctionality.model.Book;
 import id.ac.ui.cs.advprog.userfunctionality.repository.BookRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class BookServiceTest {
 
     @Mock
@@ -23,40 +31,104 @@ public class BookServiceTest {
     @InjectMocks
     private BookServiceImpl bookService;
 
+    private Book book;
+    private List<Book> bookList;
+
+    @BeforeEach
+    public void setUp() {
+        book = new Book();
+        book.setIsbn("123");
+        book.setJudulBuku("Book Title");
+        book.setPenulis("Author");
+        book.setPenerbit("Publisher");
+        book.setDeskripsi("Description");
+        book.setHarga(10000);
+        book.setStok(10);
+        book.setTanggalTerbit(java.time.LocalDate.now());
+        book.setJumlahHalaman(100);
+        book.setFotoCover("cover.jpg");
+        book.setKategori("Category");
+
+        bookList = new ArrayList<>();
+        bookList.add(book);
+    }
+
     @Test
     public void testGetBookRecommendation() {
-        // Mock data
-        Book book1 = new Book();
-        book1.setJudulBuku("Book 1");
-        book1.setFotoCover("cover1.jpg");
-        book1.setPenulis("Author 1");
-        book1.setIsbn("1234567890");
-        book1.setKategori("Fiksi");
+        List<BookTopDTO> topBooks = new ArrayList<>();
+        when(bookRepository.findTop5Book()).thenReturn(topBooks);
 
-        Book book2 = new Book();
-        book2.setJudulBuku("Book 2");
-        book2.setFotoCover("cover2.jpg");
-        book2.setPenulis("Author 2");
-        book2.setIsbn("0987654321");
-        book2.setKategori("Ilmiah");
+        List<BookTopDTO> result = bookService.getBookRecommendation();
+        assertThat(result).isEqualTo(topBooks);
+    }
 
-        when(bookRepository.findTop5Book()).thenReturn(Arrays.<BookTopDTO>asList((BookTopDTO) book1, (BookTopDTO) book2));
+    @Test
+    public void testGetAllBooks() {
+        when(bookRepository.findAll()).thenReturn(bookList);
 
-        // Test
-        List<BookTopDTO> recommendation = bookService.getBookRecommendation();
+        List<Book> result = bookService.getAllBooks();
+        assertThat(result).isEqualTo(bookList);
+    }
 
-        // Assertions
-        assertEquals(2, recommendation.size());
-        assertEquals("Book 1", recommendation.get(0).getJudulBuku());
-        assertEquals("cover1.jpg", recommendation.get(0).getFotoCover());
-        assertEquals("Author 1", recommendation.get(0).getPenulis());
-        assertEquals("1234567890", recommendation.get(0).getIsbn());
-        assertEquals(4.5, recommendation.get(0).getAverageRating());
+    @Test
+    public void testSearchBooks_WithTitleAndAuthor() {
+        Page<Book> bookPage = new PageImpl<>(bookList);
+        when(bookRepository.findByJudulBukuContainingIgnoreCaseAndPenulisContainingIgnoreCase(any(String.class), any(String.class), any(Pageable.class)))
+                .thenReturn(bookPage);
 
-        assertEquals("Book 2", recommendation.get(1).getJudulBuku());
-        assertEquals("cover2.jpg", recommendation.get(1).getFotoCover());
-        assertEquals("Author 2", recommendation.get(1).getPenulis());
-        assertEquals("0987654321", recommendation.get(1).getIsbn());
-        assertEquals(4.0, recommendation.get(1).getAverageRating());
+        Page<Book> result = bookService.searchBooks("Book Title", "Author", "judulBuku", "ASC", 1);
+        assertThat(result).isEqualTo(bookPage);
+    }
+
+    @Test
+    public void testSearchBooks_WithTitleOnly() {
+        Page<Book> bookPage = new PageImpl<>(bookList);
+        when(bookRepository.findByJudulBukuContainingIgnoreCase(any(String.class), any(Pageable.class)))
+                .thenReturn(bookPage);
+
+        Page<Book> result = bookService.searchBooks("Book Title", null, "judulBuku", "ASC", 1);
+        assertThat(result).isEqualTo(bookPage);
+    }
+
+    @Test
+    public void testSearchBooks_WithAuthorOnly() {
+        Page<Book> bookPage = new PageImpl<>(bookList);
+        when(bookRepository.findByPenulisContainingIgnoreCase(any(String.class), any(Pageable.class)))
+                .thenReturn(bookPage);
+
+        Page<Book> result = bookService.searchBooks(null, "Author", "penulis", "ASC", 1);
+        assertThat(result).isEqualTo(bookPage);
+    }
+
+    @Test
+    public void testSearchBooks_NoTitleNoAuthor() {
+        Page<Book> bookPage = new PageImpl<>(bookList);
+        when(bookRepository.findAll(any(Pageable.class))).thenReturn(bookPage);
+
+        Page<Book> result = bookService.searchBooks(null, null, "judulBuku", "ASC", 1);
+        assertThat(result).isEqualTo(bookPage);
+    }
+
+    @Test
+    public void testGetBookById() {
+        when(bookRepository.findById("123")).thenReturn(Optional.of(book));
+
+        Book result = bookService.getBookById("123");
+        assertThat(result).isEqualTo(book);
+    }
+
+    @Test
+    public void testGetBookById_NotFound() {
+        when(bookRepository.findById("123")).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> bookService.getBookById("123"));
+    }
+
+    @Test
+    public void testFindByIsbn() {
+        when(bookRepository.findByIsbn("123")).thenReturn(book);
+
+        Book result = bookService.findByIsbn("123");
+        assertThat(result).isEqualTo(book);
     }
 }
