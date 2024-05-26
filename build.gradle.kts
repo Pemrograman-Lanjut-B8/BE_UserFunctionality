@@ -30,6 +30,7 @@ val junitJupiterVersion = "5.9.1"
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation ("jakarta.validation:jakarta.validation-api:3.0.2")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
@@ -45,9 +46,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
-    implementation("com.github.javafaker:javafaker:0.14") {
-        exclude(module = "snakeyaml")
-    }
+    implementation ("jakarta.validation:jakarta.validation-api:3.0.2")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 }
 
 tasks.register<Test>("unitTest") {
@@ -80,5 +80,13 @@ tasks.test{
 }
 
 tasks.jacocoTestReport{
+
+    classDirectories.setFrom(files(classDirectories.files.map {
+        fileTree(it) {
+            exclude("**/*Application**", "**/config/**")
+        }
+    }))
+
     dependsOn(tasks.test)
+
 }

@@ -1,6 +1,6 @@
 package id.ac.ui.cs.advprog.userfunctionality.service;
 
-import com.github.javafaker.Faker;
+import id.ac.ui.cs.advprog.userfunctionality.dto.BookTopDTO;
 import id.ac.ui.cs.advprog.userfunctionality.model.Book;
 import id.ac.ui.cs.advprog.userfunctionality.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +24,10 @@ public class BookServiceImpl implements BookService {
     private BookRepository bookRepository;
 
     @Override
-    public List<Book> getBookRecommendation() {
-        return bookRepository.findTop5ByOrderByRatingDesc();
-    }
+    public List<BookTopDTO> getBookRecommendation() {
+        return bookRepository.findTop5Book();
 
+    }
 
     public List<Book> getAllBooks() {
         return bookRepository.findAll();
@@ -48,11 +48,6 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book findByIsbn(String isbn) {
-        return bookRepository.findByIsbn(isbn).orElse(null);
+        return bookRepository.findByIsbn(isbn);
 
     }
-
-    private String truncate(String value, int length) {
-        return value.length() > length ? value.substring(0, length) : value;
-    }
-}

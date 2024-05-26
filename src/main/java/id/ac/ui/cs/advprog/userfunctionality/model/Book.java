@@ -1,12 +1,13 @@
 package id.ac.ui.cs.advprog.userfunctionality.model;
 
-import java.time.LocalDate;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 //@Getter @Setter
 @Entity
@@ -49,6 +50,4 @@ public class Book {
     @Column(name = "kategori")
     private String kategori;
 
-    @Column(name = "rating")
-    private double rating;
 }
