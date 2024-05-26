@@ -2,8 +2,10 @@ package id.ac.ui.cs.advprog.userfunctionality.controller;
 
 import java.util.List;
 
+import id.ac.ui.cs.advprog.userfunctionality.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +21,9 @@ public class BookController {
 
     @Autowired
     private BookBuilderImpl bookBuilder;
+
+    @Autowired
+    private AuthService authService;
 
     @GetMapping("/")
     @ResponseBody
@@ -38,6 +43,7 @@ public class BookController {
         return bookService.getAllBooks();
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/search")
     public Page<Book> getBooks(
             @RequestParam(required = false) String judulBuku,
@@ -50,7 +56,13 @@ public class BookController {
 
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/{isbn}")
-    public Book getBookById(@PathVariable String isbn) {
+    public Book getBookById(@PathVariable String isbn, @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+        System.out.print(authService.verifyUser(token));
         return bookService.getBookById(isbn);
+    }
+
+    @GetMapping("/seed")
+    public void seedBook() {
+        bookService.seed();
     }
 }
