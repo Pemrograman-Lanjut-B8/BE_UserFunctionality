@@ -3,6 +3,7 @@ plugins {
     jacoco
     id("org.springframework.boot") version "3.2.2"
     id("io.spring.dependency-management") version "1.1.4"
+    id("org.sonarqube") version "4.4.1.3373"
 }
 
 group = "id.ac.ui.cs.advprog"
@@ -89,4 +90,12 @@ tasks.jacocoTestReport{
 
     dependsOn(tasks.test)
 
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "Pemrograman-Lanjut-B8_BE_UserFunctionality")
+        property("sonar.organization", "pemrograman-lanjut-b8")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
 }
