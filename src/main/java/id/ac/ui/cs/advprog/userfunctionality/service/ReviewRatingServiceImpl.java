@@ -6,14 +6,13 @@ import id.ac.ui.cs.advprog.userfunctionality.service.command.Command;
 import id.ac.ui.cs.advprog.userfunctionality.service.command.CreateReviewRatingCommand;
 import id.ac.ui.cs.advprog.userfunctionality.service.command.DeleteReviewRatingCommand;
 import id.ac.ui.cs.advprog.userfunctionality.service.command.UpdateReviewRatingCommand;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ReviewRatingServiceImpl implements ReviewRatingService {
@@ -22,44 +21,44 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
     private ReviewRatingRepository reviewRatingRepository;
 
     @Override
-    @Async
-    public CompletableFuture<ReviewRating> createReviewRating(ReviewRating reviewRating) {
+    public ReviewRating createReviewRating(ReviewRating reviewRating) {
         Command createCommand = new CreateReviewRatingCommand(reviewRating, reviewRatingRepository);
         createCommand.execute();
-        return CompletableFuture.completedFuture(reviewRating);
+        return reviewRating;
     }
 
     @Override
-    @Async
-    public CompletableFuture<List<ReviewRating>> findAll() {
-        return CompletableFuture.supplyAsync(() -> {
-            Iterable<ReviewRating> reviewRatingIterator = reviewRatingRepository.findAll();
-            List<ReviewRating> allReviewRating = new ArrayList<>();
-            reviewRatingIterator.forEach(allReviewRating::add);
-            return allReviewRating;
-        });
+    public List<ReviewRating> findAll() {
+        Iterable<ReviewRating> reviewRatingIterator = reviewRatingRepository.findAll();
+        List<ReviewRating> allReviewRating = new ArrayList<>();
+        reviewRatingIterator.forEach(allReviewRating::add);
+        return allReviewRating;
     }
 
     @Override
-    @Async
-    public CompletableFuture<Optional<ReviewRating>> findById(String reviewId) {
-        return CompletableFuture.supplyAsync(() -> reviewRatingRepository.findById(reviewId));
+    public Optional<ReviewRating> findById(String reviewId) {
+        return reviewRatingRepository.findById(reviewId);
     }
 
     @Override
-    @Async
-    public CompletableFuture<ReviewRating> updateReviewRating(String reviewId, ReviewRating updatedReviewRating) {
+    public ReviewRating updateReviewRating(String reviewId, ReviewRating updatedReviewRating) {
         Command updateCommand = new UpdateReviewRatingCommand(reviewId, updatedReviewRating, reviewRatingRepository);
         updateCommand.execute();
-        return CompletableFuture.completedFuture(updatedReviewRating);
+        return updatedReviewRating;
     }
 
     @Override
-    @Async
-    public CompletableFuture<Void> deleteReviewRating(String reviewId) {
+    public void deleteReviewRating(String reviewId) {
         Command deleteCommand = new DeleteReviewRatingCommand(reviewId, reviewRatingRepository);
         deleteCommand.execute();
-        return CompletableFuture.completedFuture(null);
     }
 
+    @Override
+    public double getAverageRatingByIsbn(String isbn) {
+        List<ReviewRating> reviews = reviewRatingRepository.findByBookIsbn(isbn);
+        return reviews.stream()
+                .mapToInt(ReviewRating::getRating)
+                .average()
+                .orElse(0.0);
+    }
 }

@@ -9,5 +9,5 @@ public interface BookService {
     List<Book> getBookRecommendation();
     public List<Book> getAllBooks();
     public Page<Book> searchBooks(String judulBuku, String penulis, String sortBy, String sortDirection, int pageIndex);
-    public Book getBookById(String isbn);
+    Book findByIsbn(String isbn);
 }

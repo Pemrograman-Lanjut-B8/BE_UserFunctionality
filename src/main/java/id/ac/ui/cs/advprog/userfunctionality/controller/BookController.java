@@ -54,11 +54,6 @@ public class BookController {
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/{isbn}")
     public Book getBookById(@PathVariable String isbn) {
-        return bookService.getBookById(isbn);
-    }
-
-    @GetMapping("/seed")
-    public void seedBook() {
-        bookService.seed();
+        return bookService.findByIsbn(isbn);
     }
 }
