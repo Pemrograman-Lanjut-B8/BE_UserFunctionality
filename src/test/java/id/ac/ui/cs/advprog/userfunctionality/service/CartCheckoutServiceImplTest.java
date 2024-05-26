@@ -43,11 +43,17 @@ public class CartCheckoutServiceImplTest {
         cartCheckout.setUser(user);
         cartCheckout.setItems(Collections.emptyList());
 
+        when(cartCheckoutRepository.findByUserId(any(UUID.class))).thenReturn(Optional.empty());
         when(cartCheckoutRepository.save(any(CartCheckout.class))).thenReturn(cartCheckout);
 
         CartCheckoutDTO result = cartCheckoutService.createCartCheckout(cartCheckoutDTO);
         assertNotNull(result);
         assertEquals(1L, result.getId());
+        assertEquals(cartCheckoutDTO.getUserId(), result.getUserId());
+        assertTrue(result.getItems().isEmpty());
+
+        verify(cartCheckoutRepository, times(1)).findByUserId(any(UUID.class));
+        verify(cartCheckoutRepository, times(2)).save(any(CartCheckout.class));
     }
 
     @Test
