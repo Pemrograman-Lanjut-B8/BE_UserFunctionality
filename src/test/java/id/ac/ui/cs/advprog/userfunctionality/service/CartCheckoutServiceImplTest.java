@@ -1,11 +1,7 @@
 package id.ac.ui.cs.advprog.userfunctionality.service;
 
-import id.ac.ui.cs.advprog.userfunctionality.builder.CartCheckoutBuilder;
-import id.ac.ui.cs.advprog.userfunctionality.builder.CartItemsBuilder;
 import id.ac.ui.cs.advprog.userfunctionality.dto.CartCheckoutDTO;
-import id.ac.ui.cs.advprog.userfunctionality.dto.CartItemsDTO;
 import id.ac.ui.cs.advprog.userfunctionality.model.CartCheckout;
-import id.ac.ui.cs.advprog.userfunctionality.model.CartItems;
 import id.ac.ui.cs.advprog.userfunctionality.model.UserEntity;
 import id.ac.ui.cs.advprog.userfunctionality.repository.CartCheckoutRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,11 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
