@@ -107,21 +107,6 @@ public class BookServiceImplTest {
         assertThat(result).isEqualTo(bookPage);
     }
 
-//    @Test
-//    public void testGetBookById() {
-//        when(bookRepository.findById("123")).thenReturn(Optional.of(book));
-//
-//        Book result = bookService.getBookById("123");
-//        assertThat(result).isEqualTo(book);
-//    }
-//
-//    @Test
-//    public void testGetBookById_NotFound() {
-//        when(bookRepository.findById("123")).thenReturn(Optional.empty());
-//
-//        assertThrows(RuntimeException.class, () -> bookService.getBookById("123"));
-//    }
-
     @Test
     public void testFindByIsbn() {
         when(bookRepository.findByIsbn("123")).thenReturn(book);
