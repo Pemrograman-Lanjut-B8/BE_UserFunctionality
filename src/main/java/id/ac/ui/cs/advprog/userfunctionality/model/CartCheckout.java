@@ -19,7 +19,7 @@ public class CartCheckout {
     @ManyToOne
     private UserEntity user;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<CartItems> items;
 
     @Column
