@@ -8,10 +8,12 @@ import id.ac.ui.cs.advprog.userfunctionality.model.CartCheckout;
 import id.ac.ui.cs.advprog.userfunctionality.model.CartItems;
 import id.ac.ui.cs.advprog.userfunctionality.model.Book;
 import id.ac.ui.cs.advprog.userfunctionality.model.UserEntity;
+import id.ac.ui.cs.advprog.userfunctionality.repository.BookRepository;
 import id.ac.ui.cs.advprog.userfunctionality.repository.CartCheckoutRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,15 +24,29 @@ public class CartCheckoutServiceImpl implements CartCheckoutService {
     @Autowired
     private CartCheckoutRepository cartCheckoutRepository;
 
+    @Autowired
+    private BookRepository bookRepository;
+
     @Override
     public CartCheckoutDTO createCartCheckout(CartCheckoutDTO cartCheckoutDTO) {
         UserEntity user = getUserEntity(cartCheckoutDTO.getUserId());
-        List<CartItems> items = cartCheckoutDTO.getItems().stream()
+
+        CartCheckout cartCheckout = cartCheckoutRepository.findByUserId(user.getId())
+                .orElseGet(() -> {
+                    CartCheckout newCartCheckout = new CartCheckoutBuilder()
+                            .setUser(user)
+                            .setStatus("New")
+                            .setItems(new ArrayList<>())
+                            .build();
+                    return cartCheckoutRepository.save(newCartCheckout);
+                });
+
+        List<CartItems> newItems = cartCheckoutDTO.getItems().stream()
                 .map(dto -> toCartItemsEntity(dto, user))
                 .collect(Collectors.toList());
-        CartCheckout cartCheckout = new CartCheckoutBuilder()
-                .fromDTO(cartCheckoutDTO, user, items)
-                .build();
+
+        cartCheckout.getItems().addAll(newItems);
+
         CartCheckout savedCheckout = cartCheckoutRepository.save(cartCheckout);
         return toCartCheckoutDTO(savedCheckout);
     }
@@ -115,16 +131,10 @@ public class CartCheckoutServiceImpl implements CartCheckoutService {
     }
 
     private CartItems toCartItemsEntity(CartItemsDTO dto, UserEntity user) {
-        Book book = getBookByIsbn(dto.getBookIsbn());
+        Book book = bookRepository.findByIsbn(dto.getBookIsbn());
         return new CartItemsBuilder()
                 .fromDTO(dto, book, user)
                 .build();
-    }
-
-    private Book getBookByIsbn(String isbn) {
-        Book book = new Book();
-        book.setIsbn(isbn);
-        return book;
     }
 
     private CartItemsDTO toCartItemsDTO(CartItems cartItems) {

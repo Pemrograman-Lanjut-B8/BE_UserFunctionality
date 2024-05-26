@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Setter
@@ -29,6 +30,6 @@ public class CartCheckout {
     private String status;
 
     public CartCheckout() {
-
+        this.items = new ArrayList<>();
     }
 }
