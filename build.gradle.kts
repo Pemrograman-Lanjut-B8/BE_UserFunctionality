@@ -84,11 +84,18 @@ tasks.jacocoTestReport{
 
     classDirectories.setFrom(files(classDirectories.files.map {
         fileTree(it) {
-            exclude("**/*Application**", "**/config/**")
+            exclude("**/*Application**", "**/config/**", "**/dto/*",
+                    "**/seeder/*")
         }
     }))
 
     dependsOn(tasks.test)
+
+    reports {
+        xml.required.set(true)
+        csv.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+    }
 
 }
 
