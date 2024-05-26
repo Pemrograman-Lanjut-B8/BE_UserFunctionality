@@ -1,67 +1,79 @@
-//package id.ac.ui.cs.advprog.userfunctionality.controller;
-//
-//import id.ac.ui.cs.advprog.userfunctionality.model.Book;
-//import id.ac.ui.cs.advprog.userfunctionality.service.BookService;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.test.web.servlet.MockMvc;
-//import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-//import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-//
-//import java.util.Arrays;
-//import java.util.List;
-//
-//@SpringBootTest
-//@AutoConfigureMockMvc
-//public class BookControllerTest {
-//
-//    @Autowired
-//    private MockMvc mockMvc;
-//
-//    @Autowired
-//    private BookService bookService;
-//
-//    private List<Book> sampleBooks;
-//
-////    @BeforeEach
-////    void setUp() {
-////        // Initialize sample books
-////        sampleBooks = Arrays.asList(
-////                new Book(1L, "Book A", "Author A", "Description for Book A", 4.5),
-////                new Book(2L, "Book B", "Author B", "Description for Book B", 4.6),
-////                new Book(3L, "Book C", "Author C", "Description for Book C", 4.8)
-////        );
-////
-////        // Mock BookService to return sample books
-////        bookService = new BookService() {
-////            @Override
-////            public List<Book> getTopRatedBooks() {
-////                return sampleBooks.subList(0, 2); // Return first 2 books
-////            }
-////
-////            @Override
-////            public List<Book> getAllBooks() {
-////                return sampleBooks;
-////            }
-////        };
-////    }
-////
-////    @Test
-////    public void testGetTopRatedBooks() throws Exception {
-////        // Perform GET request to /api/books/top-rated
-////        mockMvc.perform(MockMvcRequestBuilders.get("/api/books/top-rated"))
-////                .andExpect(MockMvcResultMatchers.status().isOk())
-////                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(3));
-////    }
-////
-////    @Test
-////    public void testGetAllBooks() throws Exception {
-////        // Perform GET request to /api/books/all
-////        mockMvc.perform(MockMvcRequestBuilders.get("/api/books/all"))
-////                .andExpect(MockMvcResultMatchers.status().isOk())
-////                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(sampleBooks.size())); // Expecting all sample books
-////    }
-//}
+package id.ac.ui.cs.advprog.userfunctionality.controller;
+
+import id.ac.ui.cs.advprog.userfunctionality.dto.BookTopDTO;
+import id.ac.ui.cs.advprog.userfunctionality.model.Book;
+import id.ac.ui.cs.advprog.userfunctionality.service.BookService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+@RestController
+@CrossOrigin
+class BookControllerTest {
+
+    @Mock
+    private BookService bookService;
+
+    @InjectMocks
+    private BookController bookController;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    void testUserFrontPage() {
+        String response = bookController.userFrontPage();
+        assertEquals("<h1>Welcome to User Page</h1>", response);
+    }
+
+    @Test
+    void testGetRecommendation() {
+        List<BookTopDTO> recommendedBooks = Collections.singletonList(null);
+        when(bookService.getBookRecommendation()).thenReturn(recommendedBooks);
+
+        ResponseEntity<?> response = bookController.getRecommendation();
+        assertEquals(ResponseEntity.ok(recommendedBooks), response);
+    }
+
+    @Test
+    void testGetAllBooks() {
+        List<Book> books = Collections.singletonList(new Book());
+        when(bookService.getAllBooks()).thenReturn(books);
+
+        List<Book> response = bookController.getAllBooks();
+        assertEquals(books, response);
+    }
+
+    @Test
+    void testGetBooks() {
+        Page<Book> bookPage = new PageImpl<>(Collections.singletonList(new Book()));
+        when(bookService.searchBooks("judul", "penulis", "tanggalTerbit", "DESC", 1)).thenReturn(bookPage);
+
+        Page<Book> response = bookController.getBooks("judul", "penulis", "tanggalTerbit", "DESC", 1);
+        assertEquals(bookPage, response);
+    }
+
+    @Test
+    void testGetBookById() {
+        Book book = new Book();
+        when(bookService.findByIsbn("123")).thenReturn(book);
+
+        Book response = bookController.getBookById("123");
+        assertEquals(book, response);
+    }
+}

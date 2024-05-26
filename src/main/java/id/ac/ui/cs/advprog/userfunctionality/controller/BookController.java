@@ -2,27 +2,21 @@ package id.ac.ui.cs.advprog.userfunctionality.controller;
 
 import java.util.List;
 
-import id.ac.ui.cs.advprog.userfunctionality.service.AuthService;
 import id.ac.ui.cs.advprog.userfunctionality.dto.BookTopDTO;
 import id.ac.ui.cs.advprog.userfunctionality.model.Book;
 import id.ac.ui.cs.advprog.userfunctionality.model.builders.BookBuilderImpl;
 import id.ac.ui.cs.advprog.userfunctionality.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/book")
 public class BookController {
     @Autowired
     private BookService bookService;
-
-    @Autowired
-    private BookBuilderImpl bookBuilder;
 
     @GetMapping("/")
     @ResponseBody
@@ -36,13 +30,11 @@ public class BookController {
         return ResponseEntity.ok(recommendedBooks);
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping
     public List<Book> getAllBooks() {
         return bookService.getAllBooks();
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/search")
     public Page<Book> getBooks(
             @RequestParam(required = false) String judulBuku,
@@ -53,7 +45,6 @@ public class BookController {
         return bookService.searchBooks(judulBuku, penulis, sortBy, sortDirection, pageIndex);
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/{isbn}")
     public Book getBookById(@PathVariable String isbn) {
         return bookService.findByIsbn(isbn);
