@@ -22,9 +22,6 @@ public class BookController {
     @Autowired
     private BookBuilderImpl bookBuilder;
 
-    @Autowired
-    private AuthService authService;
-
     @GetMapping("/")
     @ResponseBody
     public String userFrontPage() {
@@ -56,8 +53,7 @@ public class BookController {
 
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/{isbn}")
-    public Book getBookById(@PathVariable String isbn, @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
-        System.out.print(authService.verifyUser(token));
+    public Book getBookById(@PathVariable String isbn) {
         return bookService.getBookById(isbn);
     }
 
