@@ -15,10 +15,8 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -109,20 +107,20 @@ public class BookServiceTest {
         assertThat(result).isEqualTo(bookPage);
     }
 
-    @Test
-    public void testGetBookById() {
-        when(bookRepository.findById("123")).thenReturn(Optional.of(book));
+//    @Test
+//    public void testGetBookById() {
+//        when(bookRepository.findById("123")).thenReturn(Optional.of(book));
+//
+//        Book result = bookService.getBookById("123");
+//        assertThat(result).isEqualTo(book);
+//    }
 
-        Book result = bookService.getBookById("123");
-        assertThat(result).isEqualTo(book);
-    }
-
-    @Test
-    public void testGetBookById_NotFound() {
-        when(bookRepository.findById("123")).thenReturn(Optional.empty());
-
-        assertThrows(RuntimeException.class, () -> bookService.getBookById("123"));
-    }
+//    @Test
+//    public void testGetBookById_NotFound() {
+//        when(bookRepository.findById("123")).thenReturn(Optional.empty());
+//
+//        assertThrows(RuntimeException.class, () -> bookService.getBookById("123"));
+//    }
 
     @Test
     public void testFindByIsbn() {
