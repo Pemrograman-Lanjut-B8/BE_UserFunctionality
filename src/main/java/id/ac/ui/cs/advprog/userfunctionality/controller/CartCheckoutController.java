@@ -22,7 +22,6 @@ public class CartCheckoutController {
     public ResponseEntity<CartCheckoutDTO> getCartCheckout(@PathVariable Long checkoutId) {
         CartCheckoutDTO checkoutDTO = cartCheckoutService.findCartCheckoutById(checkoutId);
         if (checkoutDTO != null) {
-            cartCheckoutService.storeCheckedOutBooks(checkoutDTO);
             return ResponseEntity.ok(checkoutDTO);
         } else {
             return ResponseEntity.notFound().build();
@@ -32,7 +31,6 @@ public class CartCheckoutController {
     @PostMapping("/createCart")
     public ResponseEntity<CartCheckoutDTO> createCartCheckout(@RequestBody CartCheckoutDTO cartCheckout) {
         CartCheckoutDTO createdCartCheckout = cartCheckoutService.createCartCheckout(cartCheckout);
-        cartCheckoutService.storeCheckedOutBooks(createdCartCheckout);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCartCheckout);
     }
 
@@ -72,6 +70,8 @@ public class CartCheckoutController {
     public ResponseEntity<Void> checkoutCart(@PathVariable Long checkoutId) {
         boolean statusUpdated = cartCheckoutService.updateCartStatus(checkoutId, "Menunggu Konfirmasi Pembayaran");
         if (statusUpdated) {
+            CartCheckoutDTO checkoutDTO = cartCheckoutService.findCartCheckoutById(checkoutId);
+            cartCheckoutService.storeCheckedOutBooks(checkoutDTO);
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.notFound().build();
