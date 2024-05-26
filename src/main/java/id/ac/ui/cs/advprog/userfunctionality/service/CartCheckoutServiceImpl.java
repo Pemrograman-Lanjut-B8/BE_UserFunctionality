@@ -43,33 +43,33 @@ public class CartCheckoutServiceImpl implements CartCheckoutService {
     }
 
     @Override
-    public CartCheckoutDTO findCartCheckoutById(Long cartId) {
-        return cartCheckoutRepository.findById(cartId)
+    public CartCheckoutDTO findCartCheckoutById(Long checkoutId) {
+        return cartCheckoutRepository.findById(checkoutId)
                 .map(this::toCartCheckoutDTO)
-                .orElseThrow(() -> new IllegalArgumentException("Cart not found with id: " + cartId));
+                .orElseThrow(() -> new IllegalArgumentException("Cart not found with id: " + checkoutId));
     }
 
     @Override
-    public CartCheckoutDTO updateCartCheckout(Long cartId, CartCheckoutDTO cartCheckoutDTO) {
+    public CartCheckoutDTO updateCartCheckout(Long checkoutId, CartCheckoutDTO cartCheckoutDTO) {
         UserEntity user = getUserEntity(cartCheckoutDTO.getUserId());
         List<CartItems> items = cartCheckoutDTO.getItems().stream()
                 .map(dto -> toCartItemsEntity(dto, user))
                 .collect(Collectors.toList());
         CartCheckout updatedCartCheckout = new CartCheckoutBuilder()
                 .fromDTO(cartCheckoutDTO, user, items)
-                .setId(cartId)
+                .setId(checkoutId)
                 .build();
         CartCheckout savedCheckout = cartCheckoutRepository.save(updatedCartCheckout);
         return toCartCheckoutDTO(savedCheckout);
     }
 
     @Override
-    public boolean deleteCartCheckout(Long cartId) {
-        if (!cartCheckoutRepository.existsById(cartId)) {
+    public boolean deleteCartCheckout(Long checkoutId) {
+        if (!cartCheckoutRepository.existsById(checkoutId)) {
             return false;
         }
-        cartCheckoutRepository.deleteById(cartId);
-        return !cartCheckoutRepository.existsById(cartId);
+        cartCheckoutRepository.deleteById(checkoutId);
+        return !cartCheckoutRepository.existsById(checkoutId);
     }
 
     @Override
@@ -85,8 +85,8 @@ public class CartCheckoutServiceImpl implements CartCheckoutService {
     }
 
     @Override
-    public boolean updateCartStatus(Long cartId, String status) {
-        return cartCheckoutRepository.findById(cartId)
+    public boolean updateCartStatus(Long checkoutId, String status) {
+        return cartCheckoutRepository.findById(checkoutId)
                 .map(cartCheckout -> {
                     cartCheckout.setStatus(status);
                     cartCheckoutRepository.save(cartCheckout);

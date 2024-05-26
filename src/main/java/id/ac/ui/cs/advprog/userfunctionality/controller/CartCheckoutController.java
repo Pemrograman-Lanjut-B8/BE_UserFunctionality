@@ -18,9 +18,9 @@ public class CartCheckoutController {
         this.cartCheckoutService = cartCheckoutService;
     }
 
-    @GetMapping("/checkout/{cartId}")
-    public ResponseEntity<CartCheckoutDTO> getCartCheckout(@PathVariable Long cartId) {
-        CartCheckoutDTO checkoutDTO = cartCheckoutService.findCartCheckoutById(cartId);
+    @GetMapping("/checkout/{checkoutId}")
+    public ResponseEntity<CartCheckoutDTO> getCartCheckout(@PathVariable Long checkoutId) {
+        CartCheckoutDTO checkoutDTO = cartCheckoutService.findCartCheckoutById(checkoutId);
         if (checkoutDTO != null) {
             cartCheckoutService.storeCheckedOutBooks(checkoutDTO);
             return ResponseEntity.ok(checkoutDTO);
@@ -42,9 +42,9 @@ public class CartCheckoutController {
         return ResponseEntity.ok(allCartCheckouts);
     }
 
-    @PutMapping("/edit/{cartId}")
-    public ResponseEntity<CartCheckoutDTO> editCartCheckout(@PathVariable Long cartId, @RequestBody CartCheckoutDTO cartCheckout) {
-        CartCheckoutDTO updatedCartCheckout = cartCheckoutService.updateCartCheckout(cartId, cartCheckout);
+    @PutMapping("/edit/{checkoutId}")
+    public ResponseEntity<CartCheckoutDTO> editCartCheckout(@PathVariable Long checkoutId, @RequestBody CartCheckoutDTO cartCheckout) {
+        CartCheckoutDTO updatedCartCheckout = cartCheckoutService.updateCartCheckout(checkoutId, cartCheckout);
         if (updatedCartCheckout != null) {
             return ResponseEntity.ok(updatedCartCheckout);
         } else {
@@ -52,9 +52,9 @@ public class CartCheckoutController {
         }
     }
 
-    @DeleteMapping("/delete/{cartId}")
-    public ResponseEntity<Void> deleteCartCheckout(@PathVariable Long cartId) {
-        boolean deleted = cartCheckoutService.deleteCartCheckout(cartId);
+    @DeleteMapping("/delete/{checkoutId}")
+    public ResponseEntity<Void> deleteCartCheckout(@PathVariable Long checkoutId) {
+        boolean deleted = cartCheckoutService.deleteCartCheckout(checkoutId);
         if (deleted) {
             return ResponseEntity.noContent().build();
         } else {
@@ -68,9 +68,9 @@ public class CartCheckoutController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PostMapping("/status/checkout/{cartId}")
-    public ResponseEntity<Void> checkoutCart(@PathVariable Long cartId) {
-        boolean statusUpdated = cartCheckoutService.updateCartStatus(cartId, "Menunggu Konfirmasi Pembayaran");
+    @PostMapping("/status/checkout/{checkoutId}")
+    public ResponseEntity<Void> checkoutCart(@PathVariable Long checkoutId) {
+        boolean statusUpdated = cartCheckoutService.updateCartStatus(checkoutId, "Menunggu Konfirmasi Pembayaran");
         if (statusUpdated) {
             return ResponseEntity.ok().build();
         } else {
@@ -78,9 +78,9 @@ public class CartCheckoutController {
         }
     }
 
-    @PostMapping("/status/pay/{cartId}")
-    public ResponseEntity<Void> payCart(@PathVariable Long cartId) {
-        boolean statusUpdated = cartCheckoutService.updateCartStatus(cartId, "Menunggu Pengiriman Buku");
+    @PostMapping("/status/pay/{checkoutId}")
+    public ResponseEntity<Void> payCart(@PathVariable Long checkoutId) {
+        boolean statusUpdated = cartCheckoutService.updateCartStatus(checkoutId, "Menunggu Pengiriman Buku");
         if (statusUpdated) {
             return ResponseEntity.ok().build();
         } else {
@@ -88,9 +88,9 @@ public class CartCheckoutController {
         }
     }
 
-    @PostMapping("/status/cancel/{cartId}")
-    public ResponseEntity<Void> cancelCart(@PathVariable Long cartId) {
-        boolean statusUpdated = cartCheckoutService.updateCartStatus(cartId, "Pembelian Dibatalkan");
+    @PostMapping("/status/cancel/{checkoutId}")
+    public ResponseEntity<Void> cancelCart(@PathVariable Long checkoutId) {
+        boolean statusUpdated = cartCheckoutService.updateCartStatus(checkoutId, "Pembelian Dibatalkan");
         if (statusUpdated) {
             return ResponseEntity.ok().build();
         } else {
