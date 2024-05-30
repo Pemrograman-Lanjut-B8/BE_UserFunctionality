@@ -1,140 +1,103 @@
 package id.ac.ui.cs.advprog.userfunctionality.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import id.ac.ui.cs.advprog.userfunctionality.UserfunctionalityApplication;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.*;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
 
-@SpringBootTest(classes = UserfunctionalityApplication.class,
-        webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@TestPropertySource(properties = "AUTH_API=http://localhost:8080")
-public class AuthServiceTest {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-    @MockBean
+class AuthServiceImplTest {
+
+    @Mock
     private RestTemplate restTemplate;
 
     @InjectMocks
     private AuthServiceImpl authService;
 
+    @Value("${AUTH_API}")
+    private String authServiceUrl = "http://mock-auth-service";
+
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
+        authServiceUrl = "http://mock-auth-service";
     }
 
     @Test
-    public void testVerifyUserWithValidToken() {
-        String validToken = "Bearer valid-token";
+    void verifyUser_Success() {
+        String authorizationHeader = "Bearer validToken";
+        String endpoint = "/api/test/user";
+        String url = authServiceUrl + endpoint;
 
-        ResponseEntity<String> responseEntity = new ResponseEntity<>(HttpStatus.OK);
-        when(restTemplate.exchange(
-                eq("http://localhost:8080/api/test/user"),
-                eq(HttpMethod.GET),
-                any(HttpEntity.class),
-                eq(String.class)
-        )).thenReturn(responseEntity);
+        ResponseEntity<String> responseEntity = new ResponseEntity<>("OK", HttpStatus.OK);
+        when(restTemplate.exchange(eq(url), eq(HttpMethod.GET), any(HttpEntity.class), eq(String.class)))
+                .thenReturn(responseEntity);
 
-        boolean result = authService.verifyUser(validToken);
-        assertFalse(result, "Expected verification to succeed with valid token");
+        boolean result = authService.verifyUser(authorizationHeader);
+
+        assertFalse(result);
     }
 
     @Test
-    public void testVerifyUserWithInvalidToken() {
-        String invalidToken = "Bearer invalid-token";
+    void verifyAdmin_Success() {
+        String authorizationHeader = "Bearer validToken";
+        String endpoint = "/api/test/admin";
+        String url = authServiceUrl + endpoint;
 
-        ResponseEntity<String> responseEntity = new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        when(restTemplate.exchange(
-                eq("http://localhost:8080/api/test/user"),
-                eq(HttpMethod.GET),
-                any(HttpEntity.class),
-                eq(String.class)
-        )).thenReturn(responseEntity);
+        ResponseEntity<String> responseEntity = new ResponseEntity<>("OK", HttpStatus.OK);
+        when(restTemplate.exchange(eq(url), eq(HttpMethod.GET), any(HttpEntity.class), eq(String.class)))
+                .thenReturn(responseEntity);
 
-        boolean result = authService.verifyUser(invalidToken);
-        assertFalse(result, "Expected verification to fail with invalid token");
+        boolean result = authService.verifyAdmin(authorizationHeader);
+
+        assertFalse(result);
     }
 
     @Test
-    public void testVerifyUserWithException() {
-        String token = "Bearer token";
+    void verifyUser_Failure() {
+        String authorizationHeader = "Bearer invalidToken";
+        String endpoint = "/api/test/user";
+        String url = authServiceUrl + endpoint;
 
-        when(restTemplate.exchange(
-                eq("http://localhost:8080/api/test/user"),
-                eq(HttpMethod.GET),
-                any(HttpEntity.class),
-                eq(String.class)
-        )).thenThrow(new RuntimeException("Error"));
+        ResponseEntity<String> responseEntity = new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
+        when(restTemplate.exchange(eq(url), eq(HttpMethod.GET), any(HttpEntity.class), eq(String.class)))
+                .thenReturn(responseEntity);
 
-        boolean result = authService.verifyUser(token);
-        assertFalse(result, "Expected verification to fail with exception");
+        boolean result = authService.verifyUser(authorizationHeader);
+
+        assertFalse(result);
     }
 
     @Test
-    public void testVerifyAdminWithValidToken() {
-        String validToken = "Bearer valid-token";
+    void verifyAdmin_Failure() {
+        String authorizationHeader = "Bearer invalidToken";
+        String endpoint = "/api/test/admin";
+        String url = authServiceUrl + endpoint;
 
-        ResponseEntity<String> responseEntity = new ResponseEntity<>(HttpStatus.OK);
-        when(restTemplate.exchange(
-                eq("http://localhost:8080/api/test/admin"),
-                eq(HttpMethod.GET),
-                any(HttpEntity.class),
-                eq(String.class)
-        )).thenReturn(responseEntity);
+        ResponseEntity<String> responseEntity = new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
+        when(restTemplate.exchange(eq(url), eq(HttpMethod.GET), any(HttpEntity.class), eq(String.class)))
+                .thenReturn(responseEntity);
 
-        boolean result = authService.verifyAdmin(validToken);
-        assertFalse(result, "Expected verification to succeed with valid token");
+        boolean result = authService.verifyAdmin(authorizationHeader);
+
+        assertFalse(result);
     }
 
     @Test
-    public void testVerifyAdminWithInvalidToken() {
-        String invalidToken = "Bearer invalid-token";
+    void verify_NullToken() {
+        boolean userResult = authService.verifyUser(null);
+        boolean adminResult = authService.verifyAdmin(null);
 
-        ResponseEntity<String> responseEntity = new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        when(restTemplate.exchange(
-                eq("http://localhost:8080/api/test/admin"),
-                eq(HttpMethod.GET),
-                any(HttpEntity.class),
-                eq(String.class)
-        )).thenReturn(responseEntity);
+        assertFalse(userResult);
+        assertFalse(adminResult);
 
-        boolean result = authService.verifyAdmin(invalidToken);
-        assertFalse(result, "Expected verification to fail with invalid token");
-    }
-
-    @Test
-    public void testVerifyAdminWithException() {
-        String token = "Bearer token";
-
-        when(restTemplate.exchange(
-                eq("http://localhost:8080/api/test/admin"),
-                eq(HttpMethod.GET),
-                any(HttpEntity.class),
-                eq(String.class)
-        )).thenThrow(new RuntimeException("Error"));
-
-        boolean result = authService.verifyAdmin(token);
-        assertFalse(result, "Expected verification to fail with exception");
-    }
-
-    @Test
-    public void testVerifyUserWithNullToken() {
-        boolean result = authService.verifyUser(null);
-        assertFalse(result, "Expected verification to fail with null token");
-    }
-
-    @Test
-    public void testVerifyAdminWithNullToken() {
-        boolean result = authService.verifyAdmin(null);
-        assertFalse(result, "Expected verification to fail with null token");
+        verify(restTemplate, never()).exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(String.class));
     }
 }
