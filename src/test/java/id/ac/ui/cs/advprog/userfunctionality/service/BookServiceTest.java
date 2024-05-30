@@ -33,7 +33,7 @@ public class BookServiceTest {
     private List<Book> bookList;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         book = new Book();
         book.setIsbn("123");
         book.setJudulBuku("Book Title");
@@ -52,7 +52,7 @@ public class BookServiceTest {
     }
 
     @Test
-    public void testGetBookRecommendation() {
+    void testGetBookRecommendation() {
         List<BookTopDTO> topBooks = new ArrayList<>();
         when(bookRepository.findTop5Book()).thenReturn(topBooks);
 
@@ -61,7 +61,7 @@ public class BookServiceTest {
     }
 
     @Test
-    public void testGetAllBooks() {
+    void testGetAllBooks() {
         when(bookRepository.findAll()).thenReturn(bookList);
 
         List<Book> result = bookService.getAllBooks();
@@ -69,7 +69,7 @@ public class BookServiceTest {
     }
 
     @Test
-    public void testSearchBooks_WithTitleAndAuthor() {
+    void testSearchBooks_WithTitleAndAuthor() {
         Page<Book> bookPage = new PageImpl<>(bookList);
         when(bookRepository.findByJudulBukuContainingIgnoreCaseAndPenulisContainingIgnoreCase(any(String.class), any(String.class), any(Pageable.class)))
                 .thenReturn(bookPage);
@@ -79,7 +79,7 @@ public class BookServiceTest {
     }
 
     @Test
-    public void testSearchBooks_WithTitleOnly() {
+    void testSearchBooks_WithTitleOnly() {
         Page<Book> bookPage = new PageImpl<>(bookList);
         when(bookRepository.findByJudulBukuContainingIgnoreCase(any(String.class), any(Pageable.class)))
                 .thenReturn(bookPage);
@@ -89,7 +89,7 @@ public class BookServiceTest {
     }
 
     @Test
-    public void testSearchBooks_WithAuthorOnly() {
+    void testSearchBooks_WithAuthorOnly() {
         Page<Book> bookPage = new PageImpl<>(bookList);
         when(bookRepository.findByPenulisContainingIgnoreCase(any(String.class), any(Pageable.class)))
                 .thenReturn(bookPage);
@@ -99,7 +99,7 @@ public class BookServiceTest {
     }
 
     @Test
-    public void testSearchBooks_NoTitleNoAuthor() {
+    void testSearchBooks_NoTitleNoAuthor() {
         Page<Book> bookPage = new PageImpl<>(bookList);
         when(bookRepository.findAll(any(Pageable.class))).thenReturn(bookPage);
 
@@ -108,7 +108,7 @@ public class BookServiceTest {
     }
 
     @Test
-    public void testFindByIsbn() {
+    void testFindByIsbn() {
         when(bookRepository.findByIsbn("123")).thenReturn(book);
 
         Book result = bookService.findByIsbn("123");

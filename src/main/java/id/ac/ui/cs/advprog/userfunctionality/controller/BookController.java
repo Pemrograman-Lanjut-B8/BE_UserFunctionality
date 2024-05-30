@@ -4,14 +4,13 @@ import java.util.List;
 
 import id.ac.ui.cs.advprog.userfunctionality.dto.BookTopDTO;
 import id.ac.ui.cs.advprog.userfunctionality.model.Book;
-import id.ac.ui.cs.advprog.userfunctionality.model.builders.BookBuilderImpl;
 import id.ac.ui.cs.advprog.userfunctionality.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:3000", "https://fe-repository.vercel.app/"})
 @RestController
 @RequestMapping("/api/book")
 public class BookController {
