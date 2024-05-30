@@ -3,6 +3,7 @@ plugins {
     jacoco
     id("org.springframework.boot") version "3.2.2"
     id("io.spring.dependency-management") version "1.1.4"
+    id("org.sonarqube") version "4.4.1.3373"
 }
 
 group = "id.ac.ui.cs.advprog"
@@ -50,32 +51,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 }
 
-tasks.register<Test>("unitTest") {
-    description = "Runs unit tests."
-    group = "verification"
-
-    filter {
-        excludeTestsMatching("*FunctionalTest")
-    }
-}
-
-tasks.register<Test>("functionalTest") {
-    description = "Runs functional tests."
-    group = "verification"
-
-    filter {
-        includeTestsMatching("*FunctionalTest")
-    }
-}
-
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
 tasks.test{
-    filter{
-        excludeTestsMatching("*FunctionalTest")
-    }
+    useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport)
 }
 
@@ -86,7 +67,19 @@ tasks.jacocoTestReport{
             exclude("**/*Application**", "**/config/**")
         }
     }))
-
     dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        csv.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+    }
 
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "Pemrograman-Lanjut-B8_BE_UserFunctionality")
+        property("sonar.organization", "pemrograman-lanjut-b8")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
 }
